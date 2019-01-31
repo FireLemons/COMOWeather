@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            :root{
+                --fall-duration: 6s;
+                --fall-delay: 0s;
+                --landing-X: 100%;
+            }
+            
+            @keyframes deltaX{
+                from{
+                }
+                to{
+                    left: var(--landing-X);
+                }
+            }
+            
+            @keyframes deltaY{
+                from{
+                }
+                to{
+                    top: 280%;
+                }
+            }
+        
+            body{
+                margin: 0;
+                overflow: hidden;
+            }
+        
+            html, body, #snow{
+                height: 100%;
+            }
+            
+            svg{
+                animation: var(--fall-duration) cubic-bezier(.32, 0.0, 1.0, 1.0) var(--fall-delay) infinite deltaX,
+                           var(--fall-duration) linear var(--fall-delay) infinite deltaY;
+                fill: white;
+                position: absolute;
+                top: -20%;
+            }
+        
+            #snow{
+                background-image: url('assets/img/clouds.png');
+                background-size: 100% auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="snow">
+        </div>
+        <script>
+            var flakeCount = 132,
+                flakeHTML = '';
+            const minFlakeSize = 8,
+                  maxFlakeSize = 40 - minFlakeSize,
+                  snowContainer = document.getElementById('snow'),
+                  deltaXRange = 32;
+            
+            function getBiasedRandom(){
+                return 1 - Math.sqrt(1 - Math.random());
+            }
+            
+            while(flakeCount-- > 0){
+                const closeness = Math.ceil(minFlakeSize - 1 + (getBiasedRandom() * maxFlakeSize)),
+                      startX = Math.round((Math.random() * 110) - 10),
+                      endX = Math.round(startX + (Math.random() * 2 * deltaXRange) - deltaXRange),
+                      fallTime = Math.round(110880 / closeness),
+                      blur = Math.floor(Math.abs(maxFlakeSize - closeness) / 4),
+                      delay = Math.ceil(Math.random() * fallTime);
+                
+                
+                flakeHTML += '<svg ' + 
+                                `height="${2 * closeness}"` + 
+                                `width="${2 * closeness}"` +
+                                'style="' +
+                                    `--landing-X: ${endX}%;` +
+                                    `--fall-delay: -${delay}ms;` +
+                                    `--fall-duration: ${fallTime}ms;` +
+                                    `filter: blur(${blur}px);` +
+                                    `left: ${startX}%;` +
+                                '">' + 
+                                    `<circle cx="${closeness}" cy="${closeness}" r="${closeness}"/>` +
+                                '</svg>';
+            }
+            
+            snowContainer.insertAdjacentHTML('afterbegin', flakeHTML);
+        </script>
+    </body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            @keyframes slow-drift-left{
+                from{
+                    left: 40%;
+                }
+                to{
+                    left: -160%;
+                }
+            }
+            
+            @keyframes slow-drift-right1{
+                from{
+                    left: -85%;
+                }
+                to{
+                    left: 160%;
+                }
+            }
+            
+            @keyframes slow-drift-right2{
+                from{
+                    left: -120%;
+                }
+                to{
+                    left: 80%;
+                }
+            }
+        
+            body{
+                margin: 0;
+                overflow: hidden;
+            }
+        
+            html, body, body>div{
+                height: 100%;
+            }
+        
+            body>div{
+                background: #5591c9;
+            }
+            
+            #clouds{
+                display: inline-block;
+            }
+            
+            #clouds img{
+                animation-duration: 12s;
+                animation-iteration-count: infinite;
+                animation-timing-function: linear;
+                position: relative;
+            }
+            
+            #clouds img:nth-child(1){
+                left: -85%;
+                animation-delay: -6s;
+                animation-name: slow-drift-right1;
+            }
+            #clouds img:nth-child(2){
+                left: -120%;
+                animation-delay: -5s;
+                animation-name: slow-drift-right2;
+            }
+            #clouds img:nth-child(3){
+                left: 40%;
+                animation-name: slow-drift-left;
+            }
+            
+            #sun{
+                margin: 1em;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <img id="sun" src="assets/img/sun.png">
+            <div id="clouds">
+                <img src="assets/img/cloud1.png">
+                <img src="assets/img/cloud2.png">
+                <img src="assets/img/cloud3.png">
+            </div>
+        </div>
+    </body>
+</html>

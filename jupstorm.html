@@ -67,13 +67,15 @@
                       endX = Math.round(startX + (Math.random() * 2 * deltaXRange) - deltaXRange),
                       fallTime = Math.round(110880 / closeness),
                       blur = Math.floor(Math.abs(maxFlakeSize - closeness) / 4),
-                      delay = Math.ceil(Math.random() * fallTime);
+                      delay = Math.ceil(Math.random() * fallTime),
+                      gnomed = Math.random() > .025 ? 'jup' : 'gnot-a-gnoblin';
                 
                 
                 flakeHTML += '<img ' + 
                                 `height="${2 * closeness}"` + 
                                 `width="${2 * closeness}"` +
-                                'src="assets/img/jup.png" style="' +
+                                `src="assets/img/${gnomed}.png"` +
+                                    'style="' +
                                     `--landing-X: ${endX}%;` +
                                     `--fall-delay: -${delay}ms;` +
                                     `--fall-duration: ${fallTime}ms;` +

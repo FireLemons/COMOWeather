@@ -6,6 +6,7 @@
                 --fall-duration: 6s;
                 --fall-delay: 0s;
                 --landing-X: 100%;
+                --landing-Y: 280%;
             }
             
             @keyframes deltaX{
@@ -20,7 +21,7 @@
                 from{
                 }
                 to{
-                    top: 280%;
+                    top: var(--landing-Y);
                 }
             }
         
@@ -62,10 +63,50 @@
                 return 1 - Math.sqrt(1 - Math.random());
             }
             
+            function getFactors(n){
+                var i = 1,
+                    limit = n,
+                    factors = [];
+                while(i < limit){
+                    if(!(n % i)){
+                        factors.push(i);
+                        factors.push(n / i);
+                    }
+                    
+                    limit = n / i;
+                    i++;
+                }
+                
+                return factors;
+            }
+            
+            function getClosest(number_arr, n){
+                var arr = number_arr.sort((num1, num2) => num1 - num2),
+                    searchIndexStart = 0,
+                    searchIndexEnd = number_arr.length;
+                    
+                while(searchIndexStart < searchIndexEnd){
+                    let middle = Math.floor((searchIndexEnd - searchIndexStart) / 2) + searchIndexStart;
+                
+                    if(n < number_arr[middle]){
+                        searchIndexEnd = middle - 1;
+                    } else {
+                        searchIndexStart = middle + 1;
+                    }
+                }
+                
+                if(searchIndexEnd === -1){
+                    searchIndexEnd = 1;
+                }
+                
+                return (Math.abs(number_arr[searchIndexEnd] - n) < Math.abs(number_arr[searchIndexEnd - 1] - n)) ? number_arr[searchIndexEnd] : number_arr[searchIndexEnd - 1];
+            }
+            
             while(flakeCount-- > 0){
                 const closeness = Math.ceil(minFlakeSize - 1 + (getBiasedRandom() * maxFlakeSize)),
                       startX = Math.round((Math.random() * 110) - 10),
                       endX = Math.round(startX + (Math.random() * 2 * deltaXRange) - deltaXRange),
+                      speed = Math.round(110880 / closeness),
                       fallTime = Math.round(110880 / closeness),
                       blur = Math.floor(Math.abs(maxFlakeSize - closeness) / 4),
                       delay = Math.ceil(Math.random() * fallTime);

@@ -6,7 +6,7 @@
                 --fall-duration: 6s;
                 --fall-delay: 0s;
                 --landing-X: 100%;
-                --landing-Y: 280%;
+                --landing-Y: 172%;
             }
             
             @keyframes deltaX{
@@ -52,12 +52,13 @@
         <div id="snow">
         </div>
         <script>
-            var flakeCount = 132,
+            var flakeCount = 128,
                 flakeHTML = '';
-            const minFlakeSize = 8,
+            const deltaXRange = 32,
+                  loopDurations = getFactors(13860);
+                  minFlakeSize = 8,
                   maxFlakeSize = 40 - minFlakeSize,
-                  snowContainer = document.getElementById('snow'),
-                  deltaXRange = 32;
+                  snowContainer = document.getElementById('snow');
             
             function getBiasedRandom(){
                 return 1 - Math.sqrt(1 - Math.random());
@@ -105,9 +106,10 @@
             while(flakeCount-- > 0){
                 const closeness = Math.ceil(minFlakeSize - 1 + (getBiasedRandom() * maxFlakeSize)),
                       startX = Math.round((Math.random() * 110) - 10),
-                      endX = Math.round(startX + (Math.random() * 2 * deltaXRange) - deltaXRange),
                       speed = Math.round(110880 / closeness),
-                      fallTime = Math.round(110880 / closeness),
+                      fallTime = getClosest(loopDurations, speed),
+                      endX = Math.round(startX + (Math.random() * 2 * deltaXRange) - deltaXRange),
+                      endY = Math.round(192 * fallTime / speed),
                       blur = Math.floor(Math.abs(maxFlakeSize - closeness) / 4),
                       delay = Math.ceil(Math.random() * fallTime);
                 
@@ -117,10 +119,12 @@
                                 `width="${2 * closeness}"` +
                                 'style="' +
                                     `--landing-X: ${endX}%;` +
+                                    `--landing-Y: ${endY}%;` +
                                     `--fall-delay: -${delay}ms;` +
                                     `--fall-duration: ${fallTime}ms;` +
                                     `filter: blur(${blur}px);` +
                                     `left: ${startX}%;` +
+                                    `z-index: ${closeness};` +
                                 '">' + 
                                     `<circle cx="${closeness}" cy="${closeness}" r="${closeness}"/>` +
                                 '</svg>';

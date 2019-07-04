@@ -3,11 +3,21 @@
     <head>
         <title>COMOWeather</title>
         <link rel="stylesheet" href="css/index.css">
+        <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js" crossorigin="anonymous"></script>
     </head>
     <body>
-        <div id="tweets">
-            <a class="twitter-timeline" href="https://twitter.com/COMOWeatherBot?ref_src=twsrc%5Etfw">Tweets by COMOWeatherBot</a>
-            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        <div id="main">
+            <div id="guide">
+                <h2>Forecast Reference</h2>
+                <img src="./assets/img/forecast_reference.png"/>
+            </div>
+            <div id="tweets">
+                <a class="twitter-timeline" href="https://twitter.com/COMOWeatherBot?ref_src=twsrc%5Etfw">Tweets by COMOWeatherBot</a>
+                <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            </div>
         </div>
+        <script>
+            twemoji.parse(document.getElementById('guide'));
+        </script>
     </body>
 </html>

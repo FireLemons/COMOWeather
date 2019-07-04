@@ -1,3 +1,14 @@
+@font-face {
+    font-family: Roboto;
+    src: url(../assets/font/roboto/Roboto-Regular.ttf);
+}
+
+@font-face {
+    font-family: Roboto;
+    src: url(../assets/font/roboto/Roboto-Bold.ttf);
+    font-weight: bold;
+}
+
 html{
     height: 100%;
 }
@@ -9,6 +20,33 @@ body{
     background-size: cover;
 }
 
+#guide{
+    background-color: #bcdcf3;
+    border-radius: 5px;
+    width: 50%;
+    font-family: Helvetica, Roboto;
+    margin: 5px;
+}
+
+#guide h2{
+    color: #282e32;
+    margin: .5em;
+}
+
+#guide img{
+    width: 32em;
+    margin: 0 .5em;
+}
+
+#main{
+    display: flex;
+    margin: 5% 15% 0 15%;
+}
+
+#main>div{
+    padding: 5px;
+}
+
 #tweets{
-    margin: 10% 20% 0 20%;
+    width: 50%
 }

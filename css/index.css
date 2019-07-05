@@ -9,7 +9,7 @@
     font-weight: bold;
 }
 
-html{
+body, html{
     height: 100%;
 }
 
@@ -18,14 +18,17 @@ body{
     background-position: bottom;
     background-repeat: no-repeat;
     background-size: cover;
+    margin: 0;
 }
 
 #guide{
     background-color: #bcdcf3;
     border-radius: 5px;
-    width: 50%;
     font-family: Helvetica, Roboto;
+    height: 80vh; width: 50%;
     margin: 5px;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 #guide h2{
@@ -34,13 +37,13 @@ body{
 }
 
 #guide img{
-    width: 32em;
+    width: 95%;
     margin: 0 .5em;
 }
 
 #main{
     display: flex;
-    margin: 5% 15% 0 15%;
+    padding: 5% 15% 0 15%;
 }
 
 #main>div{
@@ -49,4 +52,29 @@ body{
 
 #tweets{
     width: 50%
+}
+
+@media screen and (max-aspect-ratio: 8/7){
+    body{
+        overflow: hidden;
+    }
+    
+    #guide{
+        margin: 5px;
+        height: auto; width: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+    
+    #main{
+        display: block;
+        height: 95%;
+        margin: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+    
+    #tweets{
+        width: auto;
+    }
 }

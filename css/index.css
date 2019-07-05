@@ -22,7 +22,7 @@ body{
 }
 
 #guide{
-    background-color: #bcdcf3;
+    background-color: #475978;
     border-radius: 5px;
     font-family: Helvetica, Roboto;
     height: 80vh; width: 50%;
@@ -31,14 +31,55 @@ body{
     overflow-y: auto;
 }
 
-#guide h2{
-    color: #282e32;
+#guide h2, #guide h3{
+    color: #adc3db;
     margin: .5em;
 }
 
 #guide img{
     width: 95%;
     margin: 0 .5em;
+}
+
+#guide table{
+    background-color: #324a75;
+    border-collapse: collapse;
+    margin: .5em;
+    text-align: center;
+    width: calc(100% - 1em);
+    border-radius: 1em;
+    overflow:hidden;
+}
+
+#guide table img{
+    width: 36px;
+}
+
+#guide td{
+    border: 2px solid #282e32;
+    color: #9ebad9;
+}
+
+#guide td:first-child{
+    border-left: 0;
+}
+
+#guide td:last-child{
+    border-right: 0;
+}
+
+#guide th{
+    background-color: #213d70;
+    color: #adc3db;
+    padding: .75em;
+}
+
+#guide tr:last-child td{
+    border-bottom: 0;
+}
+
+#guide tr:nth-child(2n){
+    background-color: #536078;
 }
 
 #main{

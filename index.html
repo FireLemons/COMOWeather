@@ -10,6 +10,113 @@
             <div id="guide">
                 <h2>Forecast Reference</h2>
                 <img src="./assets/img/forecast_reference.png"/>
+                <h3>Icon Meanings</h3>
+                <table>
+                    <tr>
+                        <th>Icon(s)</th>
+                        <th>Conditions</th>
+                    </tr>
+                    <tr>
+                        <td>⛈️</td>
+                        <td>thunderstorm with rain</td>
+                    </tr>
+                    <tr>
+                        <td>🌩️</td>
+                        <td>thunderstorm</td>
+                    </tr>
+                    <tr>
+                        <td>🌩️+🌦️</td>
+                        <td>thunderstorm with drizzle</td>
+                    </tr>
+                    <tr>
+                        <td>🌦️</td>
+                        <td>drizzle</td>
+                    </tr>
+                    <tr>
+                        <td>🚿+🌧️</td>
+                        <td>shower rain and drizzle, shower drizzle</td>
+                    </tr>
+                    <tr>
+                        <td>🌧️</td>
+                        <td>rain</td>
+                    </tr>
+                    <tr>
+                        <td>🌧➜❄️</td>
+                        <td>freezing rain</td>
+                    </tr>
+                    <tr>
+                        <td>🚿</td>
+                        <td>shower rain</td>
+                    </tr>
+                    <tr>
+                        <td>🌨️</td>
+                        <td>snow</td>
+                    </tr>
+                    <tr>
+                        <td>☄️</td>
+                        <td>sleet</td>
+                    </tr>
+                    <tr>
+                        <td>🚿+☄️</td>
+                        <td>shower sleet</td>
+                    </tr>
+                    <tr>
+                        <td>🌧️+🌨️</td>
+                        <td>rain and snow</td>
+                    </tr>
+                    <tr>
+                        <td>🚿+🌨️</td>
+                        <td>shower snow</td>
+                    </tr>
+                    <tr>
+                        <td>🌫️</td>
+                        <td>mist, fog</td>
+                    </tr>
+                    <tr>
+                        <td>🔥➜🌫️</td>
+                        <td>smoke</td>
+                    </tr>
+                    <tr>
+                        <td>🌫️Haze</td>
+                        <td>haze</td>
+                    </tr>
+                    <tr>
+                        <td>🌪️Sand</td>
+                        <td>sand whirls, dust whirls</td>
+                    </tr>
+                    <tr>
+                        <td>🌫️Sand</td>
+                        <td>sand</td>
+                    </tr>
+                    <tr>
+                        <td>🌫️Dust</td>
+                        <td>dust</td>
+                    </tr>
+                    <tr>
+                        <td>🌋➜🌨️</td>
+                        <td>volcanic ash</td>
+                    </tr>
+                    <tr>
+                        <td>💨</td>
+                        <td>squalls</td>
+                    </tr>
+                    <tr>
+                        <td>🌪️</td>
+                        <td>tornado</td>
+                    </tr>
+                    <tr>
+                        <td>☀️</td>
+                        <td>clear skies</td>
+                    </tr>
+                    <tr>
+                        <td>🌥️</td>
+                        <td>few clouds, scattetred clouds</td>
+                    </tr>
+                    <tr>
+                        <td>☁️</td>
+                        <td>broken clouds, overcast clouds</td>
+                    </tr>
+                </table>
                 <img src="./assets/img/direction_guide.png"/>
             </div>
             <div id="tweets">
@@ -18,7 +125,7 @@
             </div>
         </div>
         <script>
-            twemoji.parse(document.getElementById('guide'));
+            twemoji.parse(document.querySelector('#guide table'));
         </script>
     </body>
 </html>

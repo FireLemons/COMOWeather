@@ -118,4 +118,8 @@ body{
     #tweets{
         width: auto;
     }
+    
+    #tweets iframe#twitter-widget-0{
+        height: 24em !important;
+    }
 }

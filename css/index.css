@@ -21,6 +21,10 @@ body{
     margin: 0;
 }
 
+nav .brand-logo{
+    padding:  0 .5em;
+}
+
 #guide{
     background-color: #475978;
     border-radius: 5px;

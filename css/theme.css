@@ -20,6 +20,10 @@ nav{
     background-color: unset;
 }
 
+nav ul a:hover {
+    background-color: #1a237e;
+}
+
 nav .brand-logo{
     padding:  0 .5em;
 }

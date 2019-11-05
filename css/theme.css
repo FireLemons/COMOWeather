@@ -16,8 +16,16 @@ body{
     background-size: cover;
 }
 
+nav{
+    background-color: unset;
+}
+
 nav .brand-logo{
     padding:  0 .5em;
+}
+
+.nav-wrapper.indigo.darken-4{
+    background-color: #1a237e88 !important;
 }
 
 .material-icons {

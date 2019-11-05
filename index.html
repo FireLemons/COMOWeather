@@ -9,6 +9,13 @@
         <link rel="stylesheet" href="css/index.css">
         <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js" crossorigin="anonymous"></script>
         <script src="materialize/js/materialize.min.js" crossorigin="anonymous"></script>
+        <noscript>
+          <style>
+            .modal-trigger{
+              display: none
+            }
+          </style>
+        </noscript>
     </head>
     <body>
         <nav>
@@ -17,6 +24,7 @@
                 <a href="#" data-target="mobile-menu" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                 <ul id="nav-mobile" class="right hide-on-med-and-down">
                   <li><a href="#about-modal" class="modal-trigger">About</a></li>
+                  <noscript><li><a href="about.html">About</a></li></noscript>
                   <li><a href="https://github.com/FireLemons/TwitterWeatherBot">Github Repo</a></li>
                   <li><a href="configMaker.html">Config Maker</a></li>
                 </ul>
@@ -148,7 +156,7 @@
         <div id="about-modal" class="modal indigo darken-3">
             <div class="modal-content white-text">
             <h4>About COMOWeatherBot</h4>
-            <p><a href="https://twitter.com/COMOWeatherBot">@COMOWeatherBot</a> is a running instance of <a href="https://github.com/FireLemons/TwitterWeatherBot">TwitterWeatherBot</a> configure for Columbia, Missouri. Every 2 hours it tweets a forecast for the near future and a random weather fact. It tweets weather alerts if there are any. It retweets all tweets from the St.Louis National Weather Service station because that's the station that also covers Columbia. Unfortunately the bot has to stop running from time to time but it posts a catch up forecast the second it's back online.</p>
+            <p><a href="https://twitter.com/COMOWeatherBot">@COMOWeatherBot</a> is a running instance of <a href="https://github.com/FireLemons/TwitterWeatherBot">TwitterWeatherBot</a> configured for Columbia, Missouri. Every 2 hours it tweets a forecast for the near future and a random weather fact. It tweets weather alerts if there are any. It retweets all tweets from the St.Louis National Weather Service station because that's the station that also covers Columbia. Unfortunately the bot has to stop running from time to time but it posts a catch up forecast the second it's back online.</p>
         </div>
         <div class="modal-footer indigo darken-3">
           <a href="#!" class="modal-close btn-flat white-text">Close</a>

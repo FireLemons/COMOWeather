@@ -1,0 +1,51 @@
+.modal-trigger {
+  display: none
+}
+
+nav .tooltipped {
+  position: relative;
+}
+
+nav .tooltipped .tooltip {
+  background-color: #0f1126;
+  color: #fff;
+  height: 3em;
+  line-height: 3em;
+  padding: 5px;
+  text-align: left;
+  visibility: hidden;
+  white-space: nowrap;
+
+  position: absolute;
+  left: 0%; 
+  top: 128%;
+  z-index: 1
+}
+
+nav li:last-child .tooltipped .tooltip {
+  margin-left: -84%
+}
+
+nav .tooltipped:hover .tooltip {
+  visibility: visible
+}
+
+@media only screen and (min-width: 601px) {
+  nav ul a#gh-link{
+    line-height: 0
+  }
+}
+
+@media only screen and (max-width: 992px) {
+  nav .brand-logo {
+    left: 0;
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+  }
+}
+
+@media only screen and (max-width: 993px) {
+  nav a.sidenav-trigger {
+    display:none
+  }
+}

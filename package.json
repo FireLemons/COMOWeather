@@ -1,0 +1,22 @@
+{
+  "name": "como-weather-bot-webpage",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FireLemons/COMOWeather.git"
+  },
+  "author": "shenyang64@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FireLemons/COMOWeather/issues"
+  },
+  "homepage": "https://github.com/FireLemons/COMOWeather#readme",
+  "devDependencies": {
+    "mustache": "^3.1.0"
+  }
+}

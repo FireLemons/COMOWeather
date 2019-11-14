@@ -2,9 +2,9 @@
   "name": "como-weather-bot-webpage",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "build.js",
   "scripts": {
-    "build": "npx mustache -p nav.mustache test.json configMaker.mustache > configMaker.html && exit 0"
+    "build": "npx mustache -p templates/nav.mustache empty.json templates/configMaker.mustache > configMaker.html && exit 0"
   },
   "repository": {
     "type": "git",

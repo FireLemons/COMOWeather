@@ -9,11 +9,12 @@ let aboutTemplate,
     sharedStylesPartial
 
 function onAboutFilesLoaded(){
-  if(aboutTemplate && navPartial){
+  if(aboutTemplate && navPartial && sharedStylesPartial){
     fs.writeFile('./about.html', Mustache.render(aboutTemplate, {
       'js-possible': false
     }, {
-      nav: navPartial
+      nav: navPartial,
+      'shared-styles': sharedStylesPartial
     })).then(() => {
       console.log('generated about.html')
     }).catch((err) => {

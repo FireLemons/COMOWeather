@@ -6,7 +6,7 @@ let aboutTemplate,
     indexTemplate,
 
     navPartial,
-    navHeaderPartial
+    sharedStylesPartial
 
 function onAboutFilesLoaded(){
   if(aboutTemplate && navPartial){
@@ -37,11 +37,12 @@ function onConfigMakerFilesLoaded(){
 }
 
 function onIndexFilesLoaded(){
-  if(indexTemplate && navPartial){
+  if(indexTemplate && navPartial && sharedStylesPartial){
     fs.writeFile('./index.html', Mustache.render(indexTemplate, {
       'js-possible': true
     }, {
-      nav: navPartial
+      nav: navPartial,
+      'shared-styles': sharedStylesPartial
     })).then(() => {
       console.log('generated index.html')
     }).catch((err) => {
@@ -76,8 +77,18 @@ fs.readFile('./templates/index.mustache', 'utf8')
   })
 
 fs.readFile('./templates/nav.mustache', 'utf8')
-  .then((html) => {
-    navPartial = html
+  .then((template) => {
+    navPartial = template
+    onAboutFilesLoaded()
+    onConfigMakerFilesLoaded()
+    onIndexFilesLoaded()
+  }).catch((err) => {
+    console.error(err)
+  })
+
+fs.readFile('./templates/sharedStyles.mustache', 'utf8')
+  .then((template) => {
+    sharedStylesPartial = template
     onAboutFilesLoaded()
     onConfigMakerFilesLoaded()
     onIndexFilesLoaded()

@@ -24,11 +24,12 @@ function onAboutFilesLoaded(){
 }
 
 function onConfigMakerFilesLoaded(){
-  if(configMakerTemplate && navPartial){
+  if(configMakerTemplate && navPartial && sharedStylesPartial){
     fs.writeFile('./configMaker.html', Mustache.render(configMakerTemplate, {
       'js-possible': true
     }, {
-      nav: navPartial
+      nav: navPartial,
+      'shared-styles': sharedStylesPartial
     })).then(() => {
       console.log('generated configMaker.html')
     }).catch((err) => {

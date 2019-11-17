@@ -4,7 +4,7 @@
   "description": "",
   "main": "build.js",
   "scripts": {
-    "build": "npx mustache -p templates/nav.mustache empty.json templates/configMaker.mustache > configMaker.html && exit 0"
+    "autobuild": "nodemon"
   },
   "repository": {
     "type": "git",
@@ -19,5 +19,11 @@
   "devDependencies": {
     "mustache": "^3.1.0",
     "nodemon": "^1.19.4"
+  },
+  "nodemonConfig": {
+    "ext": "mustache",
+    "watch": [
+      "templates/"
+    ]
   }
 }

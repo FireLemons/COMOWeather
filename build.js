@@ -25,13 +25,13 @@ function onAboutFilesLoaded(){
 
 function onConfigMakerFilesLoaded(){
   if(configMakerTemplate && navPartial && sharedStylesPartial){
-    fs.writeFile('./configMaker.html', Mustache.render(configMakerTemplate, {
+    fs.writeFile('./configMaker/index.html', Mustache.render(configMakerTemplate, {
       'js-possible': true
     }, {
       nav: navPartial,
       'shared-styles': sharedStylesPartial
     })).then(() => {
-      console.log('generated configMaker.html')
+      console.log('generated configMaker/index.html')
     }).catch((err) => {
       console.error(err)
     })
@@ -61,7 +61,7 @@ fs.readFile('./templates/about.mustache', 'utf8')
     console.error(err)
   })
 
-fs.readFile('./templates/configMaker.mustache', 'utf8')
+fs.readFile('./configMaker/templates/configMaker.mustache', 'utf8')
   .then((template) => {
     configMakerTemplate = template
     onConfigMakerFilesLoaded()

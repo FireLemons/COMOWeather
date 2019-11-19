@@ -1,0 +1,3 @@
+[submodule "configMaker"]
+	path = configMaker
+	url = https://github.com/FireLemons/WeatherBotConfigMaker.git

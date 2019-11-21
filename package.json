@@ -23,8 +23,9 @@
   "nodemonConfig": {
     "ext": "mustache,js",
     "watch": [
-      "templates/",
-      "build.js"
+      "build.js",
+      "configMaker/templates/",
+      "templates/"
     ]
   }
 }

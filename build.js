@@ -26,6 +26,7 @@ function onAboutFilesLoaded(){
 function onConfigMakerFilesLoaded(){
   if(configMakerTemplate && navPartial && sharedStylesPartial){
     fs.writeFile('./configMaker/index.html', Mustache.render(configMakerTemplate, {
+      'extended-path': '../',
       'js-possible': true
     }, {
       nav: navPartial,

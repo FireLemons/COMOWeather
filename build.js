@@ -62,7 +62,7 @@ fs.readFile('./templates/about.mustache', 'utf8')
     console.error(err)
   })
 
-fs.readFile('./configMaker/templates/configMaker.mustache', 'utf8')
+fs.readFile('./templates/configMaker.mustache', 'utf8')
   .then((template) => {
     configMakerTemplate = template
     onConfigMakerFilesLoaded()

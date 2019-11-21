@@ -21,9 +21,10 @@
     "nodemon": "^1.19.4"
   },
   "nodemonConfig": {
-    "ext": "mustache",
+    "ext": "mustache,js",
     "watch": [
-      "templates/"
+      "templates/",
+      "build.js"
     ]
   }
 }

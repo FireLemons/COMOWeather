@@ -12,10 +12,10 @@
     <body>
         {{> nav}}
         <div id="main">
-            <div id="guide">
-                <h2>Forecast Reference</h2>
+            <div id="guide" class="indigo darken-4">
+                <h2 class="indigo-text text-accent-1">Forecast Reference</h2>
                 <img src="./assets/img/forecast_reference.png"/>
-                <h3>Icon Meanings</h3>
+                <h3 class="indigo-text text-accent-1">Icon Meanings</h3>
                 <table>
                     <tr>
                         <th>Icon(s)</th>
@@ -125,7 +125,11 @@
                 <img src="./assets/img/direction_guide.png"/>
             </div>
             <div id="tweets">
-                <a class="twitter-timeline" href="https://twitter.com/COMOWeatherBot?ref_src=twsrc%5Etfw" data-height="100%">Tweets by COMOWeatherBot (Javascript is disabled)</a>
+                <a class="twitter-timeline" 
+                   href="https://twitter.com/COMOWeatherBot?ref_src=twsrc%5Etfw"
+                   data-chrome="nofooter noborders"
+                   data-height="100%"
+                   data-theme="dark">Tweets by COMOWeatherBot (Javascript is disabled)</a>
                 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
             </div>
         </div>

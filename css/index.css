@@ -14,8 +14,6 @@ body{
 }
 
 #guide{
-    background-color: #475978;
-    border-radius: 5px;
     font-family: Helvetica, Roboto;
     height: 80vh; width: 50%;
     margin: 5px;
@@ -24,12 +22,11 @@ body{
 }
 
 #guide h2, #guide h3{
-    color: #adc3db;
     margin: .5em;
 }
 
 #guide img{
-    width: 95%;
+    width: calc(100% - 1em);
     margin: 0 .5em;
 }
 
@@ -37,10 +34,9 @@ body{
     background-color: #324a75;
     border-collapse: collapse;
     margin: .5em;
+    overflow: hidden;
     text-align: center;
     width: calc(100% - 1em);
-    border-radius: 1em;
-    overflow:hidden;
 }
 
 #guide table img{
@@ -78,7 +74,7 @@ body{
 
 #main{
     display: flex;
-    padding: 5% 15% 0 15%;
+    padding: 5% 10% 0 10%;
 }
 
 #main>div{

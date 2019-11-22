@@ -1,13 +1,13 @@
 <nav>
     <div class="nav-wrapper indigo darken-4">
-        <a href="index.html" class="brand-logo">COMO Weather</a>
+        <a href="{{ extended-path }}index.html" class="brand-logo">COMO Weather</a>
         <a href="#" data-target="mobile-menu" class="sidenav-trigger"><i class="material-icons">menu</i></a>
         <ul class="right hide-on-med-and-down">
           {{#js-possible}}
           <li><a href="#about-modal" class="modal-trigger">About</a></li>
           <noscript>
           {{/js-possible}}
-            <li><a href="about.html">About</a></li>
+            <li><a href="{{ extended-path }}about.html">About</a></li>
           {{#js-possible}}
           </noscript>
           {{/js-possible}}
@@ -18,7 +18,7 @@
         <noscript>
         {{/js-possible}}
           <ul class="right hide-on-large-only show-on-med-and-down">
-            <li><a href="about.html" class="tooltipped">
+            <li><a href="{{ extended-path }}about.html" class="tooltipped">
               <i class="material-icons">help_outline</i>
               <span class="tooltip">About</span>
             </a></li>

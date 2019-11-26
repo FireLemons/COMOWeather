@@ -1,3 +1,4 @@
+twemoji.parse(document.querySelector('#guide table'));
 let maxWaitIntervals = 16
 
 let twitterTimelineLoadListener = setInterval(() => {

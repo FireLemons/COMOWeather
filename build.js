@@ -6,6 +6,7 @@ let aboutTemplate,
     indexTemplate,
 
     navPartial,
+    sharedScriptsPartial,
     sharedStylesPartial
 
 function onAboutFilesLoaded(){
@@ -24,13 +25,14 @@ function onAboutFilesLoaded(){
 }
 
 function onConfigMakerFilesLoaded(){
-  if(configMakerTemplate && navPartial && sharedStylesPartial){
+  if(configMakerTemplate && navPartial && sharedScriptsPartial && sharedStylesPartial){
     fs.writeFile('./configMaker/index.html', Mustache.render(configMakerTemplate, {
       'extended-path': '../',
       'js-possible': true
     }, {
       nav: navPartial,
-      'shared-styles': sharedStylesPartial
+      'shared-styles': sharedStylesPartial,
+      'shared-scripts': sharedScriptsPartial
     })).then(() => {
       console.log('generated configMaker/index.html')
     }).catch((err) => {
@@ -40,12 +42,13 @@ function onConfigMakerFilesLoaded(){
 }
 
 function onIndexFilesLoaded(){
-  if(indexTemplate && navPartial && sharedStylesPartial){
+  if(indexTemplate && navPartial && sharedScriptsPartial && sharedStylesPartial){
     fs.writeFile('./index.html', Mustache.render(indexTemplate, {
       'js-possible': true
     }, {
       nav: navPartial,
-      'shared-styles': sharedStylesPartial
+      'shared-styles': sharedStylesPartial,
+      'shared-scripts': sharedScriptsPartial
     })).then(() => {
       console.log('generated index.html')
     }).catch((err) => {
@@ -93,6 +96,15 @@ fs.readFile('./templates/sharedStyles.mustache', 'utf8')
   .then((template) => {
     sharedStylesPartial = template
     onAboutFilesLoaded()
+    onConfigMakerFilesLoaded()
+    onIndexFilesLoaded()
+  }).catch((err) => {
+    console.error(err)
+  })
+
+fs.readFile('./templates/sharedScripts.mustache', 'utf8')
+  .then((template) => {
+    sharedScriptsPartial = template
     onConfigMakerFilesLoaded()
     onIndexFilesLoaded()
   }).catch((err) => {

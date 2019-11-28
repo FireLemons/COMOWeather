@@ -11,15 +11,7 @@
     {{> nav}}
     <div id="main">
     </div>
-    <div id="about-modal" class="modal indigo darken-3">
-      <div class="modal-content white-text">
-        <h4>About COMOWeatherBot</h4>
-        <p><a href="https://twitter.com/COMOWeatherBot">@COMOWeatherBot</a> is a running instance of <a href="https://github.com/FireLemons/TwitterWeatherBot">TwitterWeatherBot</a> configured for Columbia, Missouri. Every 2 hours it tweets a forecast for the near future with a random weather fact. It also tweets weather alerts if there are any. It retweets the St.Louis National Weather Service station because it's the station that also covers the Columbia area. Unfortunately the bot has to stop running from time to time but it posts a catch-up forecast the second it's back online.</p>
-      </div>
-      <div class="modal-footer indigo darken-3">
-        <a href="#!" class="modal-close btn-flat white-text">Close</a>
-      </div>
-    </div> 
+    {{> about-modal}}
     {{> shared-scripts}}
   </body>
 </html>

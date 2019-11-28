@@ -5,6 +5,7 @@ let aboutTemplate,
     configMakerTemplate,
     indexTemplate,
 
+    aboutModalPartial,
     navPartial,
     sharedScriptsPartial,
     sharedStylesPartial
@@ -25,11 +26,12 @@ function onAboutFilesLoaded(){
 }
 
 function onConfigMakerFilesLoaded(){
-  if(configMakerTemplate && navPartial && sharedScriptsPartial && sharedStylesPartial){
+  if(configMakerTemplate && aboutModalPartial && navPartial && sharedScriptsPartial && sharedStylesPartial){
     fs.writeFile('./configMaker/index.html', Mustache.render(configMakerTemplate, {
       'extended-path': '../',
       'js-possible': true
     }, {
+      'about-modal': aboutModalPartial,
       nav: navPartial,
       'shared-styles': sharedStylesPartial,
       'shared-scripts': sharedScriptsPartial
@@ -42,10 +44,11 @@ function onConfigMakerFilesLoaded(){
 }
 
 function onIndexFilesLoaded(){
-  if(indexTemplate && navPartial && sharedScriptsPartial && sharedStylesPartial){
+  if(indexTemplate && aboutModalPartial && navPartial && sharedScriptsPartial && sharedStylesPartial){
     fs.writeFile('./index.html', Mustache.render(indexTemplate, {
       'js-possible': true
     }, {
+      'about-modal': aboutModalPartial,
       nav: navPartial,
       'shared-styles': sharedStylesPartial,
       'shared-scripts': sharedScriptsPartial
@@ -77,6 +80,15 @@ fs.readFile('./templates/configMaker.mustache', 'utf8')
 fs.readFile('./templates/index.mustache', 'utf8')
   .then((template) => {
     indexTemplate = template
+    onIndexFilesLoaded()
+  }).catch((err) => {
+    console.error(err)
+  })
+
+fs.readFile('./templates/about_modal.mustache', 'utf8')
+  .then((template) => {
+    aboutModalPartial = template
+    onConfigMakerFilesLoaded()
     onIndexFilesLoaded()
   }).catch((err) => {
     console.error(err)

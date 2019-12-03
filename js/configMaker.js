@@ -3,6 +3,11 @@ const configManager = new Vue({
   data: {
     config: {}
   },
+  computed: {
+    configPrinted: function() {
+      return JSON.stringify(this.config, null, 2)
+    }
+  },
   methods: {
   }
 })

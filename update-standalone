@@ -1,0 +1,17 @@
+#!/bin/bash
+
+changed_files=($(git diff --name-only HEAD HEAD~1))
+
+cd configMaker
+
+git checkout standalone
+
+for file in "${changed_files[@]}"
+do
+  if [[ $file == *"configMaker"* &&  $file != "configMaker" ]]; then
+    cp "../$file" $file
+    echo "Copied $file to configMaker/$file"
+  fi
+done
+
+exit 0

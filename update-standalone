@@ -11,20 +11,17 @@ changed_files=("js/vue.min.js" "css/theme.css" "materialize/css/materialize.min.
 #   @outputs string "true" if an element of $2 was found to be a substring of $1 "false" otherwise
 #   @return  1 on missing param 0 on success
 matches_list () {
-  if [ -z "$1" ];then
+  matchString="$1"
+  shift
+  substrings=("$@")
+
+  if [ -z "$matchString" ];then
     echo "missing param string to be checked"
     return 1
   fi
 
-  if [ -z "$2" ];then
-    echo "missing param array of substrings"
-    return 1
-  fi
-
-  substrings=("$@")
-
   for substring in "${substrings[@]}"; do
-    if [[ $1 == *"$substring"* ]]; then
+    if [[ $matchString == *"$substring"* ]]; then
       echo true
       return 0
     fi

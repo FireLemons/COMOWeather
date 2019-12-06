@@ -1,5 +1,9 @@
 #!/bin/bash
 
+copied_files=("configMaker" "materialize" "vue" "WeatherBotBackground")
+warning_files=("assets" "build" "gitignore" "shared" "theme")
+ignored_files=("about" "favicon" "gitmodules" "index" "jupstorm" "leaves" "nav" "nojs" "package" "snowy" "sunny-skies" "update-standalone")
+
 #changed_files=($(git diff --name-only HEAD HEAD~1))
 
 # For Testing

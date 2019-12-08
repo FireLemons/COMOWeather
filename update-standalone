@@ -7,7 +7,7 @@ ignored_files=("about" "favicon" "gitmodules" "index" "jupstorm" "leaves" "nav" 
 #changed_files=($(git diff --name-only HEAD HEAD~1))
 
 # For Testing
-changed_files=("js/vue.min.js" "css/theme.css" "materialize/css/materialize.min.css" "configMaker" "css/nojs.css")
+changed_files=("js/vue.min.js" "css/theme.css" "materialize/css/materialize.min.css" "configMaker" "css/nojs.css" "js/configMaker.js")
 
 # Checks if a string contains a substring from an array
 #   @param   string  The string to examine for substrings
@@ -35,24 +35,26 @@ matches_list () {
   return 0
 }
 
-if ! test=$(matches_list "js/vue.min.js" "${changed_files[@]}"); then
-  echo "ERROR: $test"
-fi
-
-echo $test
-
 cd configMaker
 
 git checkout standalone
 
 for file in "${changed_files[@]}"; do
-  if [[ $file == *"materialize"* || $file == *"vue"* || $file == *"configMaker"* && $file != "configMaker" ]]; then
+  if ! matchesList=$(matches_list $file "${copied_files[@]}"); then
+    echo "ERROR: $matchesList"
+  elif [[ $matchesList == true || $file == "configMaker" ]]; then
 #    cp "../$file" $file
-    echo "Copied $file to configMaker/$file"
-  elif [[ $file == *"nojs"* || $file == *"shared"* || $file == *"theme"* ]]; then
-    echo "Warning changed shared file $file"
+    echo "INFO: Copied $file to configMaker/$file"
+  elif ! matchesList=$(matches_list $file "${warning_files[@]}"); then
+    echo "ERROR: $matchesList"
+  elif [[ $matchesList == true ]]; then
+    echo "WARNING: changed shared file $file"
+  elif ! matchesList=$(matches_list $file "${ignored_files[@]}"); then
+    echo "ERROR: $matchesList"
+  elif [[ $matchesList == true ]]; then
+    echo "INFO: ignored $file"
   else
-    echo $file
+    echo "WARNING: $file has no update policy"
   fi
 done
 

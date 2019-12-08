@@ -2,7 +2,7 @@
 
 copied_files=("configMaker" "materialize" "vue" "WeatherBotBackground")
 warning_files=("assets" "build" "gitignore" "shared" "theme")
-ignored_files=("about" "favicon" "gitmodules" "index" "jupstorm" "leaves" "nav" "nojs" "package" "snowy" "sunny-skies" "update-standalone")
+ignored_files=("about" "configMaker" "favicon" "gitmodules" "index" "jupstorm" "leaves" "nav" "nojs" "package" "snowy" "sunny-skies" "update-standalone")
 
 #changed_files=($(git diff --name-only HEAD HEAD~1))
 
@@ -39,23 +39,29 @@ cd configMaker
 
 git checkout standalone
 
+hadWarnings=false
+
 for file in "${changed_files[@]}"; do
   if ! matchesList=$(matches_list $file "${copied_files[@]}"); then
     echo "ERROR: $matchesList"
-  elif [[ $matchesList == true || $file == "configMaker" ]]; then
+  elif [[ $matchesList = true && $file != "configMaker" ]]; then
 #    cp "../$file" $file
     echo "INFO: Copied $file to configMaker/$file"
   elif ! matchesList=$(matches_list $file "${warning_files[@]}"); then
     echo "ERROR: $matchesList"
-  elif [[ $matchesList == true ]]; then
+  elif [[ $matchesList = true ]]; then
     echo "WARNING: changed shared file $file"
   elif ! matchesList=$(matches_list $file "${ignored_files[@]}"); then
     echo "ERROR: $matchesList"
-  elif [[ $matchesList == true ]]; then
+  elif [[ $matchesList = true ]]; then
     echo "INFO: ignored $file"
   else
     echo "WARNING: $file has no update policy"
   fi
 done
+
+if [[ hadWarnings = true ]]; then
+  git checkout master
+fi
 
 exit 0

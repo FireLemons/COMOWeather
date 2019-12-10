@@ -15,12 +15,16 @@ changed_files=($(git diff --name-only HEAD HEAD~1))
 #   @outputs string "true" if an element of $2 was found to be a substring of $1 "false" otherwise
 #   @return  1 on missing param 0 on success
 matches_list () {
-  matchString="$1"
-  shift
-  substrings=("$@")
+  local matchString=$1
+  local -n substrings=$2
 
-  if [ -z "$matchString" ];then
+  if [ -z $matchString ];then
     echo "missing param string to be checked"
+    return 1
+  fi
+
+  if [ -z $substrings ];then
+    echo "missing param array of substrings"
     return 1
   fi
 
@@ -42,17 +46,17 @@ git checkout standalone
 hadWarnings=false
 
 for file in "${changed_files[@]}"; do
-  if ! matchesList=$(matches_list $file "${copied_files[@]}"); then
+  if ! matchesList=$(matches_list $file copied_files); then
     echo "ERROR: $matchesList"
   elif [[ $matchesList = true && $file != "configMaker" ]]; then
     cp "../$file" $file
     echo "INFO: Copied $file to configMaker/$file"
-  elif ! matchesList=$(matches_list $file "${warning_files[@]}"); then
+  elif ! matchesList=$(matches_list $file warning_files); then
     echo "ERROR: $matchesList"
     hadWarnings=false
   elif [[ $matchesList = true ]]; then
     echo "WARNING: changed shared file $file"
-  elif ! matchesList=$(matches_list $file "${ignored_files[@]}"); then
+  elif ! matchesList=$(matches_list $file ignored_files); then
     echo "ERROR: $matchesList"
   elif [[ $matchesList = true ]]; then
     echo "INFO: ignored $file"

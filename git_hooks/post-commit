@@ -1,0 +1,6 @@
+#!/bin/bash
+
+unset GIT_DIR
+unset GIT_INDEX_FILE
+
+./update-standalone

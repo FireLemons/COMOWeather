@@ -12,9 +12,11 @@
     [[> nav]]
     <div id="main">
       <div id="config" class="indigo darken-4 clear">
-        <p class="center white-text">
-          {{ configPrinted }}
-        </p>
+        <div class="row">
+          <div class="input-field col s12">
+            <textarea class="materialize-textarea white-text">{{ configPrinted }}</textarea>
+          </div>
+        </div>
       </div>
     </div>
     [[> about-modal]]

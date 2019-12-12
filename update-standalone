@@ -48,6 +48,7 @@ cd configMaker
 git checkout standalone
 
 hadWarnings=false
+buildScriptChanged=false
 
 for file in "${changed_files[@]}"; do
   if ! matchesList=$(matches_list $file copied_files); then
@@ -64,11 +65,19 @@ for file in "${changed_files[@]}"; do
     echo "ERROR: $matchesList"
   elif [[ $matchesList = true ]]; then
     echo "INFO: ignored $file"
-    hadWarnings=true
   else
     echo "WARNING: $file has no update policy"
+    hadWarnings=true
+  fi
+
+  if [[ $file = "build.js" ]];then
+    buildScriptChanged=true
   fi
 done
+
+if [[ $buildScriptChanged = false ]];then
+  echo "INFO: $(node templates/build.js)"
+fi
 
 if [[ $hadWarnings = false ]]; then
   git checkout master

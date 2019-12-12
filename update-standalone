@@ -2,7 +2,7 @@
 
 copied_files=("configMaker" "materialize" "vue" "WeatherBotBackground")
 warning_files=("assets" "build" "gitignore" "shared" "theme")
-ignored_files=("about" "configMaker" "favicon" "gitmodules" "index" "jupstorm" "leaves" "nav" "nojs" "package" "snowy" "sunny-skies" "update-standalone")
+ignored_files=("about" "configMaker" "favicon" "git_hooks" "gitmodules" "index" "jupstorm" "leaves" "nav" "nojs" "package" "snowy" "sunny-skies" "update-standalone")
 
 if [[ $1 == "-a" || $1 == "--all" ]];then
   changed_files=($(git ls-tree -r master --name-only))
@@ -82,6 +82,9 @@ fi
 
 if [[ $possibleFileChanges = false ]]; then
   git checkout master
+else
+  echo ""
+  echo "WARNING: Files possibly changed. Staying on branch standalone."
 fi
 
 exit 0

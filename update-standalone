@@ -47,7 +47,7 @@ cd configMaker
 
 git checkout standalone
 
-hadWarnings=false
+possibleFileChanges=false
 buildScriptChanged=false
 
 for file in "${changed_files[@]}"; do
@@ -56,9 +56,10 @@ for file in "${changed_files[@]}"; do
   elif [[ $matchesList = true && $file != "configMaker" ]]; then
     cp "../$file" $file
     echo "INFO: Copied $file to configMaker/$file"
+    possibleFileChanges=true
   elif ! matchesList=$(matches_list $file warning_files); then
     echo "ERROR: $matchesList"
-    hadWarnings=true
+    possibleFileChanges=true
   elif [[ $matchesList = true ]]; then
     echo "WARNING: changed shared file $file"
   elif ! matchesList=$(matches_list $file ignored_files); then
@@ -67,7 +68,7 @@ for file in "${changed_files[@]}"; do
     echo "INFO: ignored $file"
   else
     echo "WARNING: $file has no update policy"
-    hadWarnings=true
+    possibleFileChanges=true
   fi
 
   if [[ $file = "build.js" ]];then
@@ -79,7 +80,7 @@ if [[ $buildScriptChanged = false ]];then
   echo "INFO: $(node templates/build.js)"
 fi
 
-if [[ $hadWarnings = false ]]; then
+if [[ $possibleFileChanges = false ]]; then
   git checkout master
 fi
 

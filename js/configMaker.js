@@ -1,3 +1,5 @@
+M.textareaAutoResize(document.getElementById('configJSON'));
+
 const configManager = new Vue({
   el: '#config',
   data: {

@@ -13,7 +13,12 @@
     <div id="main">
       <div id="config" class="indigo darken-4 clear">
         <div class="row">
-          <div class="input-field col s12">
+          <div class="input-field">
+            <input placeholder="folder for logs" type="text" class="validate white-text" v-model="config.log.logDir">
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field">
             <textarea id="configJSON" class="materialize-textarea col s10 offset-s1 indigo darken-3 white-text">{{ configPrinted }}</textarea>
           </div>
         </div>

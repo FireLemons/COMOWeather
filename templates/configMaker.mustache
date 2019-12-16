@@ -11,13 +11,26 @@
   </head>
   <body>
     [[> nav]]
-    <div id="main" class="container">
-      <div id="config" class="indigo darken-4 clear">
+    <div id="main">
+      <div id="config" class="container indigo darken-4 clear">
         <div class="row">
           <h4 class="white-text">Required Configuration</h4>
           <h5 class="white-text">Logging</h5>
           <div class="input-field">
-            <input placeholder="folder for logs (relative to index.js)" type="text" class="validate white-text" v-model="config.log.logDir">
+            <input placeholder="folder for logs (relative to index.js)" type="text" class="indigo darken-3 white-text" v-model="config.log.logDir">
+          </div>
+          <h5 class="white-text">Twitter</h5>
+          <div class="input-field">
+            <input placeholder="consumer key" type="text" class="indigo darken-3 white-text" v-model="config.twitter.consumer_key">
+          </div>
+          <div class="input-field">
+            <input placeholder="consumer secret" type="text" class="indigo darken-3 white-text" v-model="config.twitter.consumer_secret">
+          </div>
+          <div class="input-field">
+            <input placeholder="access token key" type="text" class="indigo darken-3 white-text" v-model="config.twitter.access_token_key">
+          </div>
+          <div class="input-field">
+            <input placeholder="access_token_secret" type="text" class="indigo darken-3 white-text" v-model="config.twitter.access_token_secret">
           </div>
         </div>
         <div class="row">

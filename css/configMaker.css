@@ -1,4 +1,13 @@
+body {
+  overflow-y: hidden
+}
+
+.input-field input[type="text"] {
+  padding: 0 1em
+}
+
 #config {
+  margin-top: 2em;
   padding: 1em 1em 0 1em
 }
 
@@ -7,5 +16,6 @@
 }
 
 #main {
-  margin-top: 2em
+  height: calc(100% - 64px);
+  overflow-y: scroll
 }

@@ -3,7 +3,8 @@ body {
 }
 
 .input-field input[type="text"] {
-  padding: 0 1em
+  box-sizing: border-box;
+  padding-left: 1em
 }
 
 #config {

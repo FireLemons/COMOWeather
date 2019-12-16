@@ -20,14 +20,24 @@ const configManager = new Vue({
           key: ""
         }
       }
-    }
-  },
-  computed: {
-    configPrinted: function() {
-      return JSON.stringify(this.config, null, 2)
-    }
+    },
+    configText: "",
+    configTextEdited: false
   },
   methods: {
+  },
+  mounted: function() {
+    this.configText = JSON.stringify(this.config, null, 2)
+  },
+  watch: {
+    config: {
+      handler: function(updatedConfig){
+        if(!this.configTextEdited){
+          this.configText = JSON.stringify(this.config, null, 2)
+        }
+      },
+      deep: true
+    }
   }
 })
 

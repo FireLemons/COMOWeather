@@ -6,30 +6,30 @@
 }
 
 body, html{
-    height: 100%;
+  height: 100%;
 }
 
 body{
-    background-image: url(../assets/img/WeatherBotBackground.jpg);
-    background-position: bottom;
-    background-repeat: no-repeat;
-    background-size: cover;
+  background-image: url(../assets/img/WeatherBotBackground.jpg);
+  background-position: bottom;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 nav{
-    background-color: unset;
+  background-color: unset;
 }
 
 nav ul a:hover {
-    background-color: #1a237e;
+  background-color: #1a237e;
 }
 
 nav .brand-logo{
-    padding:  0 .5em;
+  padding:  0 .5em;
 }
 
 .clear.indigo.darken-4{
-    background-color: #1a237e88 !important;
+  background-color: #1a237e88 !important;
 }
 
 .material-icons {
@@ -48,11 +48,20 @@ nav .brand-logo{
   -moz-osx-font-smoothing: grayscale;
 }
 
+.input-field input[type=text]:focus + label {
+  color: white !important;
+}
+
+.input-field input[type=text]:focus {
+  border-bottom: 1px solid white !important;
+  box-shadow: 0 1px 0 0 white !important;
+}
+
+.input-field textarea:focus + label {
+  color: white !important;
+}
+
 .row .input-field textarea:focus {
   border-bottom: 1px solid white !important;
   box-shadow: 0 1px 0 0 white !important
-}
-
-#configJSON {
-  padding: .75em
 }

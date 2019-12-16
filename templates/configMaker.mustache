@@ -5,21 +5,24 @@
     <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
     <title>Config Maker</title>
-      [[> shared-styles]]
-      <script src="[[& extended-path ]]js/vue.min.js"></script>
+    [[> shared-styles]]
+    <link rel="stylesheet" href="[[& extended-path ]]css/configMaker.css">
+    <script src="[[& extended-path ]]js/vue.min.js"></script>
   </head>
   <body>
     [[> nav]]
-    <div id="main">
+    <div id="main" class="container">
       <div id="config" class="indigo darken-4 clear">
         <div class="row">
+          <h4 class="white-text">Required Configuration</h4>
+          <h5 class="white-text">Logging</h5>
           <div class="input-field">
-            <input placeholder="folder for logs" type="text" class="validate white-text" v-model="config.log.logDir">
+            <input placeholder="folder for logs (relative to index.js)" type="text" class="validate white-text" v-model="config.log.logDir">
           </div>
         </div>
         <div class="row">
           <div class="input-field">
-            <textarea id="configJSON" class="materialize-textarea col s10 offset-s1 indigo darken-3 white-text">{{ configPrinted }}</textarea>
+            <textarea id="configJSON" class="materialize-textarea indigo darken-3 white-text">{{ configPrinted }}</textarea>
           </div>
         </div>
       </div>

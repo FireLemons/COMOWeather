@@ -1,7 +1,7 @@
 #!/bin/bash
 
 copied_files=("configMaker" "materialize" "vue" "WeatherBotBackground")
-warning_files=("assets" "build" "gitignore" "shared" "theme")
+warning_files=("assets" "build" "configMaker.css" "gitignore" "shared" "theme")
 ignored_files=("about" "configMaker" "favicon" "git_hooks" "gitmodules" "index" "jupstorm" "leaves" "nav" "nojs" "package" "snowy" "sunny-skies" "update-standalone")
 
 if [[ $1 == "-a" || $1 == "--all" ]];then
@@ -51,18 +51,18 @@ possibleFileChanges=false
 buildScriptChanged=false
 
 for file in "${changed_files[@]}"; do
-  if ! matchesList=$(matches_list $file copied_files); then
+  if ! matchesList=$(matches_list $file warning_files); then
+    echo "ERROR: $matchesList"
+  elif [[ $matchesList = true ]]; then
+    echo "WARNING: changed shared file $file"
+    possibleFileChanges=true
+  elif ! matchesList=$(matches_list $file copied_files); then
     echo "ERROR: $matchesList"
   elif [[ $matchesList = true && $file != "configMaker" ]]; then
     cp "../$file" $file
     echo "INFO: Copied $file to configMaker/$file"
     possibleFileChanges=true
-  elif ! matchesList=$(matches_list $file warning_files); then
-    echo "ERROR: $matchesList"
-    possibleFileChanges=true
-  elif [[ $matchesList = true ]]; then
-    echo "WARNING: changed shared file $file"
-  elif ! matchesList=$(matches_list $file ignored_files); then
+ elif ! matchesList=$(matches_list $file ignored_files); then
     echo "ERROR: $matchesList"
   elif [[ $matchesList = true ]]; then
     echo "INFO: ignored $file"

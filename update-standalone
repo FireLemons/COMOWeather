@@ -82,7 +82,7 @@ else
 fi
 
 if [[ "$(git status)" == *"not staged for commit"* ]]; then
-  buildScriptChanged=true
+  possibleFileChanges=true
 fi
 
 if [[ $possibleFileChanges = false ]]; then

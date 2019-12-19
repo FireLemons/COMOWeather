@@ -61,7 +61,6 @@ for file in "${changed_files[@]}"; do
   elif [[ $matchesList = true && $file != "configMaker" ]]; then
     cp "../$file" $file
     echo "INFO: Copied $file to configMaker/$file"
-    possibleFileChanges=true
  elif ! matchesList=$(matches_list $file ignored_files); then
     echo "ERROR: $matchesList"
   elif [[ $matchesList = true ]]; then
@@ -78,6 +77,12 @@ done
 
 if [[ $buildScriptChanged = false ]];then
   echo "INFO: $(node templates/build.js)"
+else
+  echo "WARNING: Skipping building configMaker via templates/build.js because of changed web page build.js"
+fi
+
+if [[ "$(git status)" == *"not staged for commit"* ]]; then
+  buildScriptChanged=true
 fi
 
 if [[ $possibleFileChanges = false ]]; then

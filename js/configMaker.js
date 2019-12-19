@@ -21,19 +21,28 @@ const configManager = new Vue({
         }
       }
     },
-    configText: "",
-    configTextEdited: false
+    ui: {
+      configJSON: {
+        configText: "",
+        configTextEdited: false
+      },
+      weather: {
+        openWeatherMap: {
+          locationType: "id"
+        }
+      }
+    }
   },
   methods: {
   },
   mounted: function() {
-    this.configText = JSON.stringify(this.config, null, 2)
+    this.ui.configJSON.configText = JSON.stringify(this.config, null, 2)
   },
   watch: {
     config: {
       handler: function(updatedConfig){
-        if(!this.configTextEdited){
-          this.configText = JSON.stringify(this.config, null, 2)
+        if(!this.ui.configJSON.configTextEdited){
+          this.ui.configJSON.configText = JSON.stringify(this.config, null, 2)
         }
       },
       deep: true

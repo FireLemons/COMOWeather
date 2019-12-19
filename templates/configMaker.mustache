@@ -32,10 +32,16 @@
           <div class="input-field">
             <input placeholder="access_token_secret" type="text" class="indigo darken-3 white-text" v-model="config.twitter.access_token_secret">
           </div>
+          <h5 class="white-text">OpenWeatherMap</h5>
+          <a class="waves-effect waves-light btn-small indigo" :class="ui.weather.openWeatherMap.locationType === 'id' ? 'darken-1' : 'darken-3'" @click="ui.weather.openWeatherMap.locationType = 'id'">City ID</a>
+          <a class="waves-effect waves-light btn-small indigo" :class="ui.weather.openWeatherMap.locationType === 'name' ? 'darken-1' : 'darken-3'" @click="ui.weather.openWeatherMap.locationType = 'name'">City Name</a>
+          <a class="waves-effect waves-light btn-small indigo" :class="ui.weather.openWeatherMap.locationType === 'coord' ? 'darken-1' : 'darken-3'" @click="ui.weather.openWeatherMap.locationType = 'coord'">Coordinates</a>
+          <a class="waves-effect waves-light btn-small indigo" :class="ui.weather.openWeatherMap.locationType === 'zip' ? 'darken-1' : 'darken-3'" @click="ui.weather.openWeatherMap.locationType = 'zip'">ZIP Code</a>
+          <h4 class="white-text">Config JSON</h4>
         </div>
         <div class="row">
           <div class="input-field">
-            <textarea id="configJSON" class="materialize-textarea indigo darken-3 white-text" v-model="configText"></textarea>
+            <textarea id="configJSON" class="materialize-textarea indigo darken-3 white-text" v-model="ui.configJSON.configText"></textarea>
           </div>
         </div>
       </div>

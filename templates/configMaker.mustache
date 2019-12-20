@@ -13,36 +13,41 @@
     [[> nav]]
     <div id="main">
       <div id="config" class="container indigo darken-4 clear">
-        <div class="row">
-          <h4 class="white-text">Required Configuration</h4>
-          <h5 class="white-text">Logging</h5>
-          <div class="input-field">
-            <input placeholder="folder for logs (relative to index.js)" type="text" class="indigo darken-3 white-text" v-model="config.log.logDir">
-          </div>
-          <h5 class="white-text">Twitter</h5>
-          <div class="input-field">
-            <input placeholder="consumer key" type="text" class="indigo darken-3 white-text" v-model="config.twitter.consumer_key">
-          </div>
-          <div class="input-field">
-            <input placeholder="consumer secret" type="text" class="indigo darken-3 white-text" v-model="config.twitter.consumer_secret">
-          </div>
-          <div class="input-field">
-            <input placeholder="access token key" type="text" class="indigo darken-3 white-text" v-model="config.twitter.access_token_key">
-          </div>
-          <div class="input-field">
-            <input placeholder="access_token_secret" type="text" class="indigo darken-3 white-text" v-model="config.twitter.access_token_secret">
-          </div>
-          <h5 class="white-text">OpenWeatherMap</h5>
-          <a class="waves-effect waves-light btn-small indigo" :class="ui.weather.openWeatherMap.locationType === 'id' ? 'darken-1' : 'darken-3'" @click="ui.weather.openWeatherMap.locationType = 'id'">City ID</a>
-          <a class="waves-effect waves-light btn-small indigo" :class="ui.weather.openWeatherMap.locationType === 'name' ? 'darken-1' : 'darken-3'" @click="ui.weather.openWeatherMap.locationType = 'name'">City Name</a>
-          <a class="waves-effect waves-light btn-small indigo" :class="ui.weather.openWeatherMap.locationType === 'coord' ? 'darken-1' : 'darken-3'" @click="ui.weather.openWeatherMap.locationType = 'coord'">Coordinates</a>
-          <a class="waves-effect waves-light btn-small indigo" :class="ui.weather.openWeatherMap.locationType === 'zip' ? 'darken-1' : 'darken-3'" @click="ui.weather.openWeatherMap.locationType = 'zip'">ZIP Code</a>
-          <h4 class="white-text">Config JSON</h4>
+        <h4 class="white-text">Required Configuration</h4>
+        <h5 class="white-text">Logging</h5>
+        <div class="input-field">
+          <input placeholder="folder for logs (relative to index.js)" type="text" class="indigo darken-3 white-text" v-model="config.log.logDir">
         </div>
-        <div class="row">
-          <div class="input-field">
-            <textarea id="configJSON" class="materialize-textarea indigo darken-3 white-text" v-model="ui.configJSON.configText"></textarea>
-          </div>
+
+        <h5 class="white-text">Twitter</h5>
+        <div class="input-field">
+          <input placeholder="consumer key" type="text" class="indigo darken-3 white-text" v-model="config.twitter.consumer_key">
+        </div>
+        <div class="input-field">
+          <input placeholder="consumer secret" type="text" class="indigo darken-3 white-text" v-model="config.twitter.consumer_secret">
+        </div>
+        <div class="input-field">
+          <input placeholder="access token key" type="text" class="indigo darken-3 white-text" v-model="config.twitter.access_token_key">
+        </div>
+        <div class="input-field">
+          <input placeholder="access_token_secret" type="text" class="indigo darken-3 white-text" v-model="config.twitter.access_token_secret">
+        </div>
+
+        <h5 class="white-text">OpenWeatherMap</h5>
+        <ul class="tabs indigo darken-3">
+          <li class="tab"><a href="#city-id" class="white-text" @click="ui.weather.openWeatherMap.locationType = 'id'">City ID</a></li>
+          <li class="tab"><a href="#city-name" class="white-text" @click="ui.weather.openWeatherMap.locationType = 'name'">City Name</a></li>
+          <li class="tab"><a href="#coord" class="white-text" @click="ui.weather.openWeatherMap.locationType = 'coord'">Coordinates</a></li>
+          <li class="tab"><a href="#zip-code" class="white-text" @click="ui.weather.openWeatherMap.locationType = 'zip'">ZIP Code</a></li>
+        </ul>
+        <div id="city-id">Test 1</div>
+        <div id="city-name">Test 2</div>
+        <div id="coord">Test 3</div>
+        <div id="zip-code">Test 4</div>
+
+        <h4 class="white-text">Config JSON</h4>
+        <div class="input-field">
+          <textarea id="configJSON" class="materialize-textarea indigo darken-3 white-text" v-model="ui.configJSON.configText"></textarea>
         </div>
       </div>
     </div>

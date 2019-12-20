@@ -7,6 +7,19 @@ body {
   padding-left: 1em
 }
 
+.tabs .indicator {
+  background-color: #eee;
+}
+
+.tabs .tab a.active {
+  background-color: #3949ab;
+  color: #fff
+}
+
+.tabs .tab a:focus.active {
+    background-color: #3949ab;
+}
+
 #config {
   margin-top: 2em;
   padding: 1em 1em 0 1em

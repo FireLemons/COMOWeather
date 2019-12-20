@@ -1,5 +1,3 @@
-M.textareaAutoResize(document.getElementById('configJSON'));
-
 const configManager = new Vue({
   el: '#config',
   data: {
@@ -36,6 +34,8 @@ const configManager = new Vue({
   methods: {
   },
   mounted: function() {
+    M.Tabs.init(document.querySelectorAll('.tabs'))
+    M.textareaAutoResize(document.getElementById('configJSON'));
     this.ui.configJSON.configText = JSON.stringify(this.config, null, 2)
   },
   watch: {

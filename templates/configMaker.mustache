@@ -30,7 +30,7 @@
           <input placeholder="access token key" type="text" class="indigo darken-3 white-text" v-model="config.twitter.access_token_key">
         </div>
         <div class="input-field">
-          <input placeholder="access_token_secret" type="text" class="indigo darken-3 white-text" v-model="config.twitter.access_token_secret">
+          <input placeholder="access token secret" type="text" class="indigo darken-3 white-text" v-model="config.twitter.access_token_secret">
         </div>
 
         <h5 class="white-text">OpenWeatherMap</h5>
@@ -40,10 +40,24 @@
           <li class="tab"><a href="#coord" class="white-text" @click="ui.weather.openWeatherMap.locationType = 'coord'">Coordinates</a></li>
           <li class="tab"><a href="#zip-code" class="white-text" @click="ui.weather.openWeatherMap.locationType = 'zip'">ZIP Code</a></li>
         </ul>
-        <div id="city-id">Test 1</div>
-        <div id="city-name">Test 2</div>
-        <div id="coord">Test 3</div>
-        <div id="zip-code">Test 4</div>
+        <div id="city-id">
+          <div class="input-field">
+            <input placeholder="city ID" type="number" class="indigo darken-3 white-text" v-model="config.weather.openWeatherMap.location['id']">
+          </div>
+        </div>
+        <div id="city-name">
+          <div class="input-field">
+            <input placeholder="city name" type="text" class="indigo darken-3 white-text" v-model="config.weather.openWeatherMap.location['name']">
+          </div>
+          <div class="input-field">
+            <input type="text" id="country-code-selector" class="autocomplete">
+            <label for="country-code-selector">Autocomplete</label>
+          </div>
+        </div>
+        <div id="coord">
+        </div>
+        <div id="zip-code">
+        </div>
 
         <h4 class="white-text">Config JSON</h4>
         <div class="input-field">

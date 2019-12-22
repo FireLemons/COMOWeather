@@ -2,7 +2,7 @@ body {
   overflow-y: hidden
 }
 
-.input-field input[type="text"] {
+.input-field input[type="text"], .input-field input[type="number"] {
   box-sizing: border-box;
   padding-left: 1em
 }

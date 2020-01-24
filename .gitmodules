@@ -1,3 +1,6 @@
 [submodule "configMaker"]
 	path = configMaker
 	url = https://github.com/FireLemons/WeatherBotConfigMaker.git
+[submodule "Abbreviation-Autocomplete"]
+	path = abbreviationAutocomplete
+	url = https://github.com/FireLemons/Abbreviation-Autocomplete

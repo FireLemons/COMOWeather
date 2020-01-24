@@ -7,6 +7,7 @@
     <title>Config Maker</title>
     [[> shared-styles]]
     <link rel="stylesheet" href="[[& extended-path ]]css/configMaker.css">
+    <link rel="stylesheet" href="[[& extended-path ]]abbreviationAutocomplete/abbreviationAutocomplete.css">
     <script src="[[& extended-path ]]js/vue.min.js"></script>
   </head>
   <body>
@@ -50,8 +51,7 @@
             <input placeholder="city name" type="text" class="indigo darken-3 white-text" v-model="config.weather.openWeatherMap.location['name']">
           </div>
           <div class="input-field">
-            <input type="text" id="country-code-selector" class="autocomplete">
-            <label for="country-code-selector">Autocomplete</label>
+            <abbreviation-autocomplete :data="ui.countryCodeAutocompleteData" :limit="10" :min-input-length="2"></abbreviation-autocomplete>
           </div>
         </div>
         <div id="coord">
@@ -67,6 +67,7 @@
     </div>
     [[> about-modal]]
     [[> shared-scripts]]
+    <script src="[[& extended-path ]]abbreviationAutocomplete/abbreviation-autocomplete.js"></script>
     <script src="[[& extended-path ]]js/configMaker.js"></script>
   </body>
 </html>

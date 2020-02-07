@@ -1,0 +1,8 @@
+#!/bin/bash
+
+cd configMaker
+
+unset GIT_DIR
+unset GIT_INDEX_FILE
+
+./../update-standalone

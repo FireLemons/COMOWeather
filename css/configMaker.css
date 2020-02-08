@@ -2,6 +2,21 @@ body {
   overflow-y: hidden
 }
 
+/*
+ * Hide number spinners for firefox
+ */
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance:textfield;
+}
+
+
 .input-field input[type="text"], .input-field input[type="number"] {
   box-sizing: border-box;
   padding-left: 1em

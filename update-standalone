@@ -78,7 +78,7 @@ done
 if [[ $buildScriptChanged = false ]];then
   echo "INFO: $(node templates/build.js)"
 else
-  echo "WARNING: Skipping building configMaker via templates/build.js because of changed web page build.js"
+  echo "WARNING: Skipping building configMaker via templates/build.js because build.js has been modified"
 fi
 
 if [[ "$(git status)" == *"not staged for commit"* ]]; then

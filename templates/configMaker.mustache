@@ -51,7 +51,7 @@
             <input placeholder="city name" type="text" class="indigo darken-3 white-text" v-model="config.weather.openWeatherMap.location['name']">
           </div>
           <div class="input-field">
-            <abbreviation-autocomplete :data="ui.countryCodeAutocompleteData" :limit="10" :min-input-length="2"></abbreviation-autocomplete>
+            <abbreviation-autocomplete :data="ui.countryCodeAutocompleteData" :limit="10" :min-input-length="2" placeholder="country code"></abbreviation-autocomplete>
           </div>
         </div>
         <div id="coord">

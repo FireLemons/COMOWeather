@@ -4,62 +4,10 @@ const Mustache = require('mustache')
 console.log('WARNING: Generated files will only be updated if the source files were last modified later than the generated files.')
 
 const TRACKED_FILE_COUNT = 10
+let checked_file_count = 0
 const fileLastModifiedTimes = {}
 const templates = {}
 const partials = {}
-
-// Generates about.html if all the templates are loaded
-function onAboutFilesLoaded () {
-  if (templates['about'] && partials['nav'] && partials['sharedStyles']) {
-    fs.writeFile('./about.html', Mustache.render(templates['about'], {
-      'js-possible': false
-    }, {
-      nav: partials['nav'],
-      'shared-styles': partials['sharedStyles']
-    })).then(() => {
-      console.log('generated about.html')
-    }).catch((err) => {
-      console.error(err)
-    })
-  }
-}
-
-// Generates configMaker/index.html if all the templates are loaded
-function onConfigMakerFilesLoaded () {
-  if (templates['configMaker'] && partials['about_modal'] && partials['nav'] && partials['sharedScripts'] && partials['sharedStyles']) {
-    fs.writeFile('./configMaker/index.html', Mustache.render(templates['configMaker'], {
-      'extended-path': '../',
-      'js-possible': true
-    }, {
-      'about-modal': partials['about_modal'],
-      nav: partials['nav'],
-      'shared-styles': partials['sharedStyles'],
-      'shared-scripts': partials['sharedScripts']
-    })).then(() => {
-      console.log('generated configMaker/index.html')
-    }).catch((err) => {
-      console.error(err)
-    })
-  }
-}
-
-// Generates index.html if all the files are loaded
-function onIndexFilesLoaded () {
-  if (templates['index'] && partials['about_modal'] && partials['nav'] && partials['sharedScripts'] && partials['sharedStyles']) {
-    fs.writeFile('./index.html', Mustache.render(templates['index'], {
-      'js-possible': true
-    }, {
-      'about-modal': partials['about_modal'],
-      nav: partials['nav'],
-      'shared-styles': partials['sharedStyles'],
-      'shared-scripts': partials['sharedScripts']
-    })).then(() => {
-      console.log('generated index.html')
-    }).catch((err) => {
-      console.error(err)
-    })
-  }
-}
 
 // Asynchronously fetches the last modified time for a file and stores it in fileLastModifiedTimes
 //   @param  {string}       path The path to the template to be loaded
@@ -69,17 +17,17 @@ function checkLastModifiedTime(path){
   fs.stat(path)
     .then((stats) => {
       fileLastModifiedTimes[/.*?([a-zA-Z_]+\.[a-z]+)$/.exec(path)[1]] = stats.mtimeMs
-      console.log(fileLastModifiedTimes)
+      checked_file_count++
+
+      if(checked_file_count > TRACKED_FILE_COUNT){
+          throw new RangeError(`\n\nERROR: More files were asynchronously checked for last modified time than TRACKED_FILE_COUNT(${TRACKED_FILE_COUNT}).\n       The callback for all files checked may not work properly. Was a new file added?\n`)
+      } else if(checked_file_count === TRACKED_FILE_COUNT){
+        //all files checked callback
+      }
     }).catch((err) => {
       throw err
     })
 }
-
-trackedFiles = ['./templates/about.mustache']
-
-trackedFiles.forEach((filePath) => {
-  checkLastModifiedTime(filePath)
-})
 
 // Loads the contents of a template file
 //   @param  {string}       path The path to the template to be loaded
@@ -124,6 +72,78 @@ function loadTemplate(path, destination, callbackList){
       throw err
     })
 }
+
+// Generates about.html if all required templates are loaded
+function onAboutFilesLoaded () {
+  if (templates['about'] && partials['nav'] && partials['sharedStyles']) {
+    fs.writeFile('./about.html', Mustache.render(templates['about'], {
+      'js-possible': false
+    }, {
+      nav: partials['nav'],
+      'shared-styles': partials['sharedStyles']
+    })).then(() => {
+      console.log('generated about.html')
+    }).catch((err) => {
+      console.error(err)
+    })
+  }
+}
+
+// Generates configMaker/index.html if all required templates are loaded
+function onConfigMakerFilesLoaded () {
+  if (templates['configMaker'] && partials['about_modal'] && partials['nav'] && partials['sharedScripts'] && partials['sharedStyles']) {
+    fs.writeFile('./configMaker/index.html', Mustache.render(templates['configMaker'], {
+      'extended-path': '../',
+      'js-possible': true
+    }, {
+      'about-modal': partials['about_modal'],
+      nav: partials['nav'],
+      'shared-styles': partials['sharedStyles'],
+      'shared-scripts': partials['sharedScripts']
+    })).then(() => {
+      console.log('generated configMaker/index.html')
+    }).catch((err) => {
+      console.error(err)
+    })
+  }
+}
+
+// Generates index.html if all required templates are loaded
+function onIndexFilesLoaded () {
+  if (templates['index'] && partials['about_modal'] && partials['nav'] && partials['sharedScripts'] && partials['sharedStyles']) {
+    fs.writeFile('./index.html', Mustache.render(templates['index'], {
+      'js-possible': true
+    }, {
+      'about-modal': partials['about_modal'],
+      nav: partials['nav'],
+      'shared-styles': partials['sharedStyles'],
+      'shared-scripts': partials['sharedScripts']
+    })).then(() => {
+      console.log('generated index.html')
+    }).catch((err) => {
+      console.error(err)
+    })
+  }
+}
+
+// Check last modified times of all files
+trackedFiles = [
+                './about.html',
+                './configMaker/index.html',
+                './index.html',
+                './templates/about.mustache',
+                './templates/configMaker.mustache',
+                './templates/index.mustache',
+                './templates/about_modal.mustache',
+                './templates/nav.mustache',
+                './templates/sharedStyles.mustache',
+                './templates/sharedScripts.mustache'
+               ]
+
+trackedFiles.forEach((filePath) => {
+  checkLastModifiedTime(filePath)
+})
+
 
 loadTemplate('./templates/about.mustache', 'template', [onAboutFilesLoaded])
 loadTemplate('./templates/configMaker.mustache', 'template', [onConfigMakerFilesLoaded])

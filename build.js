@@ -3,6 +3,8 @@ const Mustache = require('mustache')
 
 console.log('WARNING: Generated files will only be updated if the source files were last modified later than the generated files.')
 
+const TRACKED_FILE_COUNT = 10
+const fileLastModifiedTimes = {}
 const templates = {}
 const partials = {}
 
@@ -59,12 +61,33 @@ function onIndexFilesLoaded () {
   }
 }
 
+// Asynchronously fetches the last modified time for a file and stores it in fileLastModifiedTimes
+//   @param  {string}       path The path to the template to be loaded
+//   @throws {SystemError}  When the file's metadata could not be read
+//   @throws {TypeError}    When path is not a string
+function checkLastModifiedTime(path){
+  fs.stat(path)
+    .then((stats) => {
+      fileLastModifiedTimes[/.*?([a-zA-Z_]+\.[a-z]+)$/.exec(path)[1]] = stats.mtimeMs
+      console.log(fileLastModifiedTimes)
+    }).catch((err) => {
+      throw err
+    })
+}
+
+trackedFiles = ['./templates/about.mustache']
+
+trackedFiles.forEach((filePath) => {
+  checkLastModifiedTime(filePath)
+})
+
 // Loads the contents of a template file
-//   @param  {string}     path The path to the template to be loaded
-//   @param  {string}     destination A string describing which object to store the template in
-//   @param  {function[]} callbackList An array of functions to run after the template has been loaded
-//   @throws {RangeError} When an unsupported destination is passed
-//   @throws {TypeError}  When a parameter is of the incorrect type
+//   @param  {string}       path The path to the template to be loaded
+//   @param  {string}       destination A string describing which object to store the template in
+//   @param  {function[]}   callbackList An array of functions to run after the template has been loaded
+//   @throws {RangeError}   When an unsupported destination is passed
+//   @throws {SystemError}  When the file could not be read
+//   @throws {TypeError}    When a parameter is of the incorrect type
 function loadTemplate(path, destination, callbackList){
   if(!path instanceof String) {
     throw new TypeError('Param path is not a string')
@@ -98,7 +121,7 @@ function loadTemplate(path, destination, callbackList){
         elem()
       })
     }).catch((err) => {
-      console.error(err)
+      throw err
     })
 }
 

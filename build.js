@@ -4,7 +4,7 @@ const Mustache = require('mustache')
 console.log('WARNING: Generated files will only be updated if the source files were last modified later than the generated files.')
 
 const TRACKED_FILE_COUNT = 10
-let checked_file_count = 0
+let checkedFileCount = 0
 const fileLastModifiedTimes = {}
 const templates = {}
 const partials = {}
@@ -13,16 +13,16 @@ const partials = {}
 //   @param  {string}       path The path to the template to be loaded
 //   @throws {SystemError}  When the file's metadata could not be read
 //   @throws {TypeError}    When path is not a string
-function checkLastModifiedTime(path){
+function checkLastModifiedTime (path) {
   fs.stat(path)
     .then((stats) => {
       fileLastModifiedTimes[/.*?([a-zA-Z_]+\.[a-z]+)$/.exec(path)[1]] = stats.mtimeMs
-      checked_file_count++
+      checkedFileCount++
 
-      if(checked_file_count > TRACKED_FILE_COUNT){
-          throw new RangeError(`\n\nERROR: More files were asynchronously checked for last modified time than TRACKED_FILE_COUNT(${TRACKED_FILE_COUNT}).\n       The callback for all files checked may not work properly. Was a new file added?\n`)
-      } else if(checked_file_count === TRACKED_FILE_COUNT){
-        //all files checked callback
+      if (checkedFileCount > TRACKED_FILE_COUNT) {
+        throw new RangeError(`\n\nERROR: More files were asynchronously checked for last modified time than TRACKED_FILE_COUNT(${TRACKED_FILE_COUNT}).\n       The callback for all files checked may not work properly. Was a new file added?\n`)
+      } else if (checkedFileCount === TRACKED_FILE_COUNT) {
+        // all files checked callback
       }
     }).catch((err) => {
       throw err
@@ -36,33 +36,32 @@ function checkLastModifiedTime(path){
 //   @throws {RangeError}   When an unsupported destination is passed
 //   @throws {SystemError}  When the file could not be read
 //   @throws {TypeError}    When a parameter is of the incorrect type
-function loadTemplate(path, destination, callbackList){
-  if(!path instanceof String) {
+function loadTemplate (path, destination, callbackList) {
+  if (!(path instanceof String)) {
     throw new TypeError('Param path is not a string')
   }
 
-  if(!destination instanceof String) {
+  if (!(destination instanceof String)) {
     throw new TypeError('Param destination is not a string')
   }
 
-  if(!callbackList instanceof Array) {
+  if (!(callbackList instanceof Array)) {
     throw new TypeError('Param callbackList is not an array')
   }
 
   fs.readFile(path, 'utf8')
     .then((template) => {
-      let key = /.*?([a-zA-Z_]+)\.[a-z]+$/.exec(path)[1]
+      const key = /.*?([a-zA-Z_]+)\.[a-z]+$/.exec(path)[1]
 
       switch (destination) {
         case 'partial':
           partials[key] = template
-          break;
+          break
         case 'template':
           templates[key] = template
-          break;
+          break
         default:
           throw new RangeError('Unrecognized destination: ' + destination)
-          break;
       }
 
       callbackList.forEach((elem) => {
@@ -75,12 +74,12 @@ function loadTemplate(path, destination, callbackList){
 
 // Generates about.html if all required templates are loaded
 function onAboutFilesLoaded () {
-  if (templates['about'] && partials['nav'] && partials['sharedStyles']) {
-    fs.writeFile('./about.html', Mustache.render(templates['about'], {
+  if (templates.about && partials.nav && partials.sharedStyles) {
+    fs.writeFile('./about.html', Mustache.render(templates.about, {
       'js-possible': false
     }, {
-      nav: partials['nav'],
-      'shared-styles': partials['sharedStyles']
+      nav: partials.nav,
+      'shared-styles': partials.sharedStyles
     })).then(() => {
       console.log('generated about.html')
     }).catch((err) => {
@@ -91,15 +90,15 @@ function onAboutFilesLoaded () {
 
 // Generates configMaker/index.html if all required templates are loaded
 function onConfigMakerFilesLoaded () {
-  if (templates['configMaker'] && partials['about_modal'] && partials['nav'] && partials['sharedScripts'] && partials['sharedStyles']) {
-    fs.writeFile('./configMaker/index.html', Mustache.render(templates['configMaker'], {
+  if (templates.configMaker && partials.about_modal && partials.nav && partials.sharedScripts && partials.sharedStyles) {
+    fs.writeFile('./configMaker/index.html', Mustache.render(templates.configMaker, {
       'extended-path': '../',
       'js-possible': true
     }, {
-      'about-modal': partials['about_modal'],
-      nav: partials['nav'],
-      'shared-styles': partials['sharedStyles'],
-      'shared-scripts': partials['sharedScripts']
+      'about-modal': partials.about_modal,
+      nav: partials.nav,
+      'shared-styles': partials.sharedStyles,
+      'shared-scripts': partials.sharedScripts
     })).then(() => {
       console.log('generated configMaker/index.html')
     }).catch((err) => {
@@ -110,14 +109,14 @@ function onConfigMakerFilesLoaded () {
 
 // Generates index.html if all required templates are loaded
 function onIndexFilesLoaded () {
-  if (templates['index'] && partials['about_modal'] && partials['nav'] && partials['sharedScripts'] && partials['sharedStyles']) {
-    fs.writeFile('./index.html', Mustache.render(templates['index'], {
+  if (templates.index && partials.about_modal && partials.nav && partials.sharedScripts && partials.sharedStyles) {
+    fs.writeFile('./index.html', Mustache.render(templates.index, {
       'js-possible': true
     }, {
-      'about-modal': partials['about_modal'],
-      nav: partials['nav'],
-      'shared-styles': partials['sharedStyles'],
-      'shared-scripts': partials['sharedScripts']
+      'about-modal': partials.about_modal,
+      nav: partials.nav,
+      'shared-styles': partials.sharedStyles,
+      'shared-scripts': partials.sharedScripts
     })).then(() => {
       console.log('generated index.html')
     }).catch((err) => {
@@ -126,24 +125,28 @@ function onIndexFilesLoaded () {
   }
 }
 
+// Determines which files to generate based on last modified times of files
+function onLastModifiedTimesCollected () {
+
+}
+
 // Check last modified times of all files
-trackedFiles = [
-                './about.html',
-                './configMaker/index.html',
-                './index.html',
-                './templates/about.mustache',
-                './templates/configMaker.mustache',
-                './templates/index.mustache',
-                './templates/about_modal.mustache',
-                './templates/nav.mustache',
-                './templates/sharedStyles.mustache',
-                './templates/sharedScripts.mustache'
-               ]
+const trackedFiles = [
+  './about.html',
+  './configMaker/index.html',
+  './index.html',
+  './templates/about.mustache',
+  './templates/configMaker.mustache',
+  './templates/index.mustache',
+  './templates/about_modal.mustache',
+  './templates/nav.mustache',
+  './templates/sharedStyles.mustache',
+  './templates/sharedScripts.mustache'
+]
 
 trackedFiles.forEach((filePath) => {
   checkLastModifiedTime(filePath)
 })
-
 
 loadTemplate('./templates/about.mustache', 'template', [onAboutFilesLoaded])
 loadTemplate('./templates/configMaker.mustache', 'template', [onConfigMakerFilesLoaded])
@@ -152,4 +155,3 @@ loadTemplate('./templates/about_modal.mustache', 'partial', [onConfigMakerFilesL
 loadTemplate('./templates/nav.mustache', 'partial', [onAboutFilesLoaded, onConfigMakerFilesLoaded, onIndexFilesLoaded])
 loadTemplate('./templates/sharedStyles.mustache', 'partial', [onAboutFilesLoaded, onConfigMakerFilesLoaded, onIndexFilesLoaded])
 loadTemplate('./templates/sharedScripts.mustache', 'partial', [onConfigMakerFilesLoaded, onIndexFilesLoaded])
-

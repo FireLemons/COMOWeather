@@ -16,7 +16,7 @@ const partials = {}
 function checkLastModifiedTime (path) {
   fs.stat(path)
     .then((stats) => {
-      fileLastModifiedTimes[/.*?([a-zA-Z_]+\.[a-z]+)$/.exec(path)[1]] = stats.mtimeMs
+      fileLastModifiedTimes[path] = stats.mtimeMs
       checkedFileCount++
 
       if (checkedFileCount > TRACKED_FILE_COUNT) {
@@ -83,6 +83,7 @@ function onAboutFilesLoaded () {
     })).then(() => {
       console.log('generated about.html')
     }).catch((err) => {
+      console.log('ERROR: Failed to generate about.html')
       console.error(err)
     })
   }
@@ -102,6 +103,7 @@ function onConfigMakerFilesLoaded () {
     })).then(() => {
       console.log('generated configMaker/index.html')
     }).catch((err) => {
+      console.log('ERROR: Failed to generate configMaker/index.html')
       console.error(err)
     })
   }
@@ -120,6 +122,7 @@ function onIndexFilesLoaded () {
     })).then(() => {
       console.log('generated index.html')
     }).catch((err) => {
+      console.error('ERROR: Failed to generate index.html')
       console.error(err)
     })
   }

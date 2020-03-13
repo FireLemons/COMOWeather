@@ -9,8 +9,71 @@ const fileLastModifiedTimes = {}
 const templates = {}
 const partials = {}
 
+class SourceFile {
+  // @param   {string}    path The path to the source file
+  // @param   {string}    type The type of source file
+  // @throws  {TypeError} when an argument is of the wrong type
+  constructor (path, type) {
+    if(typeof path !==  'string') {
+      throw new TypeError('Param path must be a string')
+    }
+
+    if(typeof type !== 'string') {
+      throw new TypeError('Param type must be a string')
+    }
+
+    this.path = path
+    this.type = type
+  }
+
+  // Loads the contents of the file
+  //  @param {function[]} callbackList A list of functions to call after the source file has been loaded
+  load(callbackList){
+    
+  }
+
+  getContents(){
+  
+  }
+}
+
+// Represents a generated file and the source files used to generate it
+class DependencyTree {
+  // @param  {string}     generatedFilePath The path to the file generated
+  // @param  {function}   generationCallback The function to generate the file after all the source files are loaded
+  // @param  {SourceFile[]}  sources The source files needed to generate a file
+  // @throws {TypeError} when an argument is of the wrong type
+  constructor (generatedFilePath, generationCallback, sources) {
+    if(generatedFilePath !== 'string') {
+      throw new TypeError('Param generatedFilePath must be a string')
+    }
+
+    if(!(generationCallback instanceof Function)) {
+      throw new TypeError('Param generationCallback must be a function')
+    }
+
+    if(!(sources instanceof Array)) {
+      throw new TypeError('Param sources must be an Array')
+    } else {
+      sources.forEach((source) => {
+        if(!(source instanceof SourceFile)){
+          throw new TypeError('Param sources can only contain SourceFile objects')
+        }
+      })
+    }
+
+    this.generatedFilePath = generatedFilePath
+    this.generationCallback = generationCallback
+    this.sources = sources
+  }
+
+  isMemberSource(source) {
+    return sources.includes(source)
+  }
+}
+
 // Asynchronously fetches the last modified time for a file and stores it in fileLastModifiedTimes
-//   @param  {string}       path The path to the template to be loaded
+//   @param  {string}       path The path to the source file to be loaded
 //   @throws {SystemError}  When the file's metadata could not be read
 //   @throws {TypeError}    When path is not a string
 function checkLastModifiedTime (path) {
@@ -29,19 +92,19 @@ function checkLastModifiedTime (path) {
     })
 }
 
-// Loads the contents of a template file
-//   @param  {string}       path The path to the template to be loaded
-//   @param  {string}       destination A string describing which object to store the template in
-//   @param  {function[]}   callbackList An array of functions to run after the template has been loaded
+// Loads the contents of a source file
+//   @param  {string}       path The path to the source to be loaded
+//   @param  {string}       destination A string describing which object to store the source file contents in
+//   @param  {function[]}   callbackList An array of functions to run after the source file has been loaded
 //   @throws {RangeError}   When an unsupported destination is passed
 //   @throws {SystemError}  When the file could not be read
 //   @throws {TypeError}    When a parameter is of the incorrect type
 function loadTemplate (path, destination, callbackList) {
-  if (!(path instanceof String)) {
+  if (typeof path !== 'string') {
     throw new TypeError('Param path is not a string')
   }
 
-  if (!(destination instanceof String)) {
+  if (typeof destination !== 'string') {
     throw new TypeError('Param destination is not a string')
   }
 
@@ -50,15 +113,15 @@ function loadTemplate (path, destination, callbackList) {
   }
 
   fs.readFile(path, 'utf8')
-    .then((template) => {
+    .then((source) => {
       const key = /.*?([a-zA-Z_]+)\.[a-z]+$/.exec(path)[1]
 
       switch (destination) {
         case 'partial':
-          partials[key] = template
+          partials[key] = source
           break
         case 'template':
-          templates[key] = template
+          templates[key] = source
           break
         default:
           throw new RangeError('Unrecognized destination: ' + destination)
@@ -72,7 +135,7 @@ function loadTemplate (path, destination, callbackList) {
     })
 }
 
-// Generates about.html if all required templates are loaded
+// Generates about.html if all required source files are loaded
 function onAboutFilesLoaded () {
   if (templates.about && partials.nav && partials.sharedStyles) {
     fs.writeFile('./about.html', Mustache.render(templates.about, {
@@ -89,7 +152,7 @@ function onAboutFilesLoaded () {
   }
 }
 
-// Generates configMaker/index.html if all required templates are loaded
+// Generates configMaker/index.html if all required source files are loaded
 function onConfigMakerFilesLoaded () {
   if (templates.configMaker && partials.about_modal && partials.nav && partials.sharedScripts && partials.sharedStyles) {
     fs.writeFile('./configMaker/index.html', Mustache.render(templates.configMaker, {
@@ -109,7 +172,7 @@ function onConfigMakerFilesLoaded () {
   }
 }
 
-// Generates index.html if all required templates are loaded
+// Generates index.html if all required source files are loaded
 function onIndexFilesLoaded () {
   if (templates.index && partials.about_modal && partials.nav && partials.sharedScripts && partials.sharedStyles) {
     fs.writeFile('./index.html', Mustache.render(templates.index, {
@@ -130,7 +193,22 @@ function onIndexFilesLoaded () {
 
 // Determines which files to generate based on last modified times of files
 function onLastModifiedTimesCollected () {
+  let requiredSources = {},
+      aboutTime = fileLastModifiedTimes['./about.html'],
+      aboutTemplateTime = fileLastModifiedTimes['./templates/about.mustache'],
+      navTemplateTime = fileLastModifiedTimes['./templates/nav.mustache']
 
+
+  if( aboutTemplateTime > aboutTime || navTemplateTime > aboutTime){
+    requiredSources['./templates/about.mustache'] = {
+      type: 'template',
+
+    }
+  }
+
+  for(let source in requiredSources){
+  
+  }
 }
 
 // Check last modified times of all files

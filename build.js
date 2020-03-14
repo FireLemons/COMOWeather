@@ -32,8 +32,15 @@ class SourceFile {
     
   }
 
+  // Get the contents of the file
+  //  @returns {string}         the contents of the file
+  //  @throws  {ReferenceError} when the contents have not been loaded
   getContents(){
-  
+    if(!(this.contents)){
+      throw new ReferenceError('File contents not loaded')
+    }
+
+    return this.contents
   }
 }
 

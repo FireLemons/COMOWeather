@@ -14,11 +14,11 @@ class SourceFile {
   // @param   {string}    type The type of source file
   // @throws  {TypeError} when an argument is of the wrong type
   constructor (path, type) {
-    if(typeof path !==  'string') {
+    if (typeof path !== 'string') {
       throw new TypeError('Param path must be a string')
     }
 
-    if(typeof type !== 'string') {
+    if (typeof type !== 'string') {
       throw new TypeError('Param type must be a string')
     }
 
@@ -28,15 +28,15 @@ class SourceFile {
 
   // Loads the contents of the file
   //  @param {function[]} callbackList A list of functions to call after the source file has been loaded
-  load(callbackList){
-    
+  load (callbackList) {
+
   }
 
   // Get the contents of the file
   //  @returns {string}         the contents of the file
   //  @throws  {ReferenceError} when the contents have not been loaded
-  getContents(){
-    if(!(this.contents)){
+  getContents () {
+    if (!(this.contents)) {
       throw new ReferenceError('File contents not loaded')
     }
 
@@ -51,19 +51,19 @@ class DependencyTree {
   // @param  {SourceFile[]}  sources The source files needed to generate a file
   // @throws {TypeError} when an argument is of the wrong type
   constructor (generatedFilePath, generationCallback, sources) {
-    if(generatedFilePath !== 'string') {
+    if (generatedFilePath !== 'string') {
       throw new TypeError('Param generatedFilePath must be a string')
     }
 
-    if(!(generationCallback instanceof Function)) {
+    if (!(generationCallback instanceof Function)) {
       throw new TypeError('Param generationCallback must be a function')
     }
 
-    if(!(sources instanceof Array)) {
+    if (!(sources instanceof Array)) {
       throw new TypeError('Param sources must be an Array')
     } else {
       sources.forEach((source) => {
-        if(!(source instanceof SourceFile)){
+        if (!(source instanceof SourceFile)) {
           throw new TypeError('Param sources can only contain SourceFile objects')
         }
       })
@@ -74,8 +74,8 @@ class DependencyTree {
     this.sources = sources
   }
 
-  isMemberSource(source) {
-    return sources.includes(source)
+  isMemberSource (source) {
+    return this.sources.includes(source)
   }
 }
 
@@ -200,21 +200,20 @@ function onIndexFilesLoaded () {
 
 // Determines which files to generate based on last modified times of files
 function onLastModifiedTimesCollected () {
-  let requiredSources = {},
-      aboutTime = fileLastModifiedTimes['./about.html'],
-      aboutTemplateTime = fileLastModifiedTimes['./templates/about.mustache'],
-      navTemplateTime = fileLastModifiedTimes['./templates/nav.mustache']
+  const requiredSources = {}
+  const aboutTime = fileLastModifiedTimes['./about.html']
+  const aboutTemplateTime = fileLastModifiedTimes['./templates/about.mustache']
+  const navTemplateTime = fileLastModifiedTimes['./templates/nav.mustache']
 
-
-  if( aboutTemplateTime > aboutTime || navTemplateTime > aboutTime){
+  if (aboutTemplateTime > aboutTime || navTemplateTime > aboutTime) {
     requiredSources['./templates/about.mustache'] = {
-      type: 'template',
+      type: 'template'
 
     }
   }
 
-  for(let source in requiredSources){
-  
+  for (const source in requiredSources) {
+
   }
 }
 

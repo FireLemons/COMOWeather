@@ -3,12 +3,6 @@ const Mustache = require('mustache')
 
 console.log('WARNING: Generated files will only be updated if the source files were last modified later than the generated files.')
 
-const TRACKED_FILE_COUNT = 10
-let checkedFileCount = 0
-const fileLastModifiedTimes = {}
-const templates = {}
-const partials = {}
-
 class SourceFile {
   // @param   {string}    path The path to the source file
   // @param   {string}    type The type of source file
@@ -26,12 +20,6 @@ class SourceFile {
     this.type = type
   }
 
-  // Loads the contents of the file
-  //  @param {function[]} callbackList A list of functions to call after the source file has been loaded
-  load (callbackList) {
-
-  }
-
   // Get the contents of the file
   //  @returns {string}         the contents of the file
   //  @throws  {ReferenceError} when the contents have not been loaded
@@ -41,6 +29,40 @@ class SourceFile {
     }
 
     return this.contents
+  }
+
+
+  // Returns whether the contents have been loaded
+  //   @returns {boolean} True if the contents of the file have been loaded. False otherwise
+  isLoaded () {
+    return this.contents !== undefined
+  }
+
+  // Loads the contents of the file
+  //   @param {function[]} callbackList A list of functions to call after the source file has been loaded
+  //   @throws {SystemError}  When the file could not be read
+  //   @throws {TypeError}    When a parameter is of the incorrect type
+  load (callbackList) {
+    if (!(callbackList instanceof Array)) {
+      throw new TypeError('Param callbackList is not an array')
+    } else {
+      callbackList.forEach((callback) => {
+        if (!(callback instanceof Function)) {
+          throw new TypeError('Param callbackList can only contain function objects')
+        }
+      })
+    }
+
+    fs.readFile(this.path, 'utf8')
+      .then((contents) => {
+        this.contents = contents
+
+        callbackList.forEach((elem) => {
+          elem()
+        })
+      }).catch((err) => {
+        throw err
+      })
   }
 }
 
@@ -78,6 +100,34 @@ class DependencyTree {
     return this.sources.includes(source)
   }
 }
+
+let   checkedFileCount = 0
+const TRACKED_FILE_COUNT = 10
+const trackedFiles = [
+  './about.html',
+  './configMaker/index.html',
+  './index.html',
+  './templates/about.mustache',
+  './templates/configMaker.mustache',
+  './templates/index.mustache',
+  './templates/about_modal.mustache',
+  './templates/nav.mustache',
+  './templates/sharedStyles.mustache',
+  './templates/sharedScripts.mustache'
+]
+
+const fileLastModifiedTimes = {}
+const sources = {
+  'about': new SourceFile('./templates/about.mustache', 'template'),
+  'configMaker': new SourceFile('./templates/configMaker.mustache', 'template'),
+  'index': new SourceFile('./templates/index.mustache', 'template'),
+  'about_modal': new SourceFile('./templates/about_modal.mustache', 'partial'),
+  'nav': new SourceFile('./templates/nav.mustache', 'partial'),
+  'sharedStyles': new SourceFile('./templates/sharedStyles.mustache', 'partial'),
+  'sharedScripts': new SourceFile('./templates/sharedScripts.mustache', 'partial')
+}
+const templates = {}
+const partials = {}
 
 // Asynchronously fetches the last modified time for a file and stores it in fileLastModifiedTimes
 //   @param  {string}       path The path to the source file to be loaded
@@ -144,8 +194,8 @@ function loadTemplate (path, destination, callbackList) {
 
 // Generates about.html if all required source files are loaded
 function onAboutFilesLoaded () {
-  if (templates.about && partials.nav && partials.sharedStyles) {
-    fs.writeFile('./about.html', Mustache.render(templates.about, {
+  if (sources.about.isLoaded() && partials.nav && partials.sharedStyles) {
+    fs.writeFile('./about.html', Mustache.render(sources.about.getContents(), {
       'js-possible': false
     }, {
       nav: partials.nav,
@@ -218,24 +268,12 @@ function onLastModifiedTimesCollected () {
 }
 
 // Check last modified times of all files
-const trackedFiles = [
-  './about.html',
-  './configMaker/index.html',
-  './index.html',
-  './templates/about.mustache',
-  './templates/configMaker.mustache',
-  './templates/index.mustache',
-  './templates/about_modal.mustache',
-  './templates/nav.mustache',
-  './templates/sharedStyles.mustache',
-  './templates/sharedScripts.mustache'
-]
 
 trackedFiles.forEach((filePath) => {
   checkLastModifiedTime(filePath)
 })
 
-loadTemplate('./templates/about.mustache', 'template', [onAboutFilesLoaded])
+sources['about'].load([onAboutFilesLoaded])
 loadTemplate('./templates/configMaker.mustache', 'template', [onConfigMakerFilesLoaded])
 loadTemplate('./templates/index.mustache', 'template', [onIndexFilesLoaded])
 loadTemplate('./templates/about_modal.mustache', 'partial', [onConfigMakerFilesLoaded, onIndexFilesLoaded])

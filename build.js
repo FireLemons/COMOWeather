@@ -126,8 +126,6 @@ const sources = {
   'sharedStyles': new SourceFile('./templates/sharedStyles.mustache', 'partial'),
   'sharedScripts': new SourceFile('./templates/sharedScripts.mustache', 'partial')
 }
-const templates = {}
-const partials = {}
 
 // Asynchronously fetches the last modified time for a file and stores it in fileLastModifiedTimes
 //   @param  {string}       path The path to the source file to be loaded
@@ -149,57 +147,14 @@ function checkLastModifiedTime (path) {
     })
 }
 
-// Loads the contents of a source file
-//   @param  {string}       path The path to the source to be loaded
-//   @param  {string}       destination A string describing which object to store the source file contents in
-//   @param  {function[]}   callbackList An array of functions to run after the source file has been loaded
-//   @throws {RangeError}   When an unsupported destination is passed
-//   @throws {SystemError}  When the file could not be read
-//   @throws {TypeError}    When a parameter is of the incorrect type
-function loadTemplate (path, destination, callbackList) {
-  if (typeof path !== 'string') {
-    throw new TypeError('Param path is not a string')
-  }
-
-  if (typeof destination !== 'string') {
-    throw new TypeError('Param destination is not a string')
-  }
-
-  if (!(callbackList instanceof Array)) {
-    throw new TypeError('Param callbackList is not an array')
-  }
-
-  fs.readFile(path, 'utf8')
-    .then((source) => {
-      const key = /.*?([a-zA-Z_]+)\.[a-z]+$/.exec(path)[1]
-
-      switch (destination) {
-        case 'partial':
-          partials[key] = source
-          break
-        case 'template':
-          templates[key] = source
-          break
-        default:
-          throw new RangeError('Unrecognized destination: ' + destination)
-      }
-
-      callbackList.forEach((elem) => {
-        elem()
-      })
-    }).catch((err) => {
-      throw err
-    })
-}
-
 // Generates about.html if all required source files are loaded
 function onAboutFilesLoaded () {
-  if (sources.about.isLoaded() && partials.nav && partials.sharedStyles) {
+  if (sources.about.isLoaded() && sources.nav.isLoaded() && sources.sharedStyles.isLoaded()) {
     fs.writeFile('./about.html', Mustache.render(sources.about.getContents(), {
       'js-possible': false
     }, {
-      nav: partials.nav,
-      'shared-styles': partials.sharedStyles
+      nav: sources.nav.getContents(),
+      'shared-styles': sources.sharedStyles.getContents()
     })).then(() => {
       console.log('generated about.html')
     }).catch((err) => {
@@ -211,15 +166,15 @@ function onAboutFilesLoaded () {
 
 // Generates configMaker/index.html if all required source files are loaded
 function onConfigMakerFilesLoaded () {
-  if (templates.configMaker && partials.about_modal && partials.nav && partials.sharedScripts && partials.sharedStyles) {
-    fs.writeFile('./configMaker/index.html', Mustache.render(templates.configMaker, {
+  if (sources.configMaker.isLoaded() && sources.about_modal.isLoaded() && sources.nav.isLoaded() && sources.sharedScripts.isLoaded() && sources.sharedStyles.isLoaded()) {
+    fs.writeFile('./configMaker/index.html', Mustache.render(sources.configMaker.getContents(), {
       'extended-path': '../',
       'js-possible': true
     }, {
-      'about-modal': partials.about_modal,
-      nav: partials.nav,
-      'shared-styles': partials.sharedStyles,
-      'shared-scripts': partials.sharedScripts
+      'about-modal': sources.about_modal.getContents(),
+      nav: sources.nav.getContents(),
+      'shared-styles': sources.sharedStyles.getContents(),
+      'shared-scripts': sources.sharedScripts.getContents()
     })).then(() => {
       console.log('generated configMaker/index.html')
     }).catch((err) => {
@@ -231,14 +186,14 @@ function onConfigMakerFilesLoaded () {
 
 // Generates index.html if all required source files are loaded
 function onIndexFilesLoaded () {
-  if (templates.index && partials.about_modal && partials.nav && partials.sharedScripts && partials.sharedStyles) {
-    fs.writeFile('./index.html', Mustache.render(templates.index, {
+  if (sources.index.isLoaded() && sources.about_modal.isLoaded() && sources.nav.isLoaded() && sources.sharedScripts.isLoaded() && sources.sharedStyles.isLoaded()) {
+    fs.writeFile('./index.html', Mustache.render(sources.index.getContents(), {
       'js-possible': true
     }, {
-      'about-modal': partials.about_modal,
-      nav: partials.nav,
-      'shared-styles': partials.sharedStyles,
-      'shared-scripts': partials.sharedScripts
+      'about-modal': sources.about_modal.getContents(),
+      nav: sources.nav.getContents(),
+      'shared-scripts': sources.sharedScripts.getContents(),
+      'shared-styles': sources.sharedStyles.getContents()
     })).then(() => {
       console.log('generated index.html')
     }).catch((err) => {
@@ -256,10 +211,7 @@ function onLastModifiedTimesCollected () {
   const navTemplateTime = fileLastModifiedTimes['./templates/nav.mustache']
 
   if (aboutTemplateTime > aboutTime || navTemplateTime > aboutTime) {
-    requiredSources['./templates/about.mustache'] = {
-      type: 'template'
 
-    }
   }
 
   for (const source in requiredSources) {
@@ -274,9 +226,9 @@ trackedFiles.forEach((filePath) => {
 })
 
 sources['about'].load([onAboutFilesLoaded])
-loadTemplate('./templates/configMaker.mustache', 'template', [onConfigMakerFilesLoaded])
-loadTemplate('./templates/index.mustache', 'template', [onIndexFilesLoaded])
-loadTemplate('./templates/about_modal.mustache', 'partial', [onConfigMakerFilesLoaded, onIndexFilesLoaded])
-loadTemplate('./templates/nav.mustache', 'partial', [onAboutFilesLoaded, onConfigMakerFilesLoaded, onIndexFilesLoaded])
-loadTemplate('./templates/sharedStyles.mustache', 'partial', [onAboutFilesLoaded, onConfigMakerFilesLoaded, onIndexFilesLoaded])
-loadTemplate('./templates/sharedScripts.mustache', 'partial', [onConfigMakerFilesLoaded, onIndexFilesLoaded])
+sources['configMaker'].load([onConfigMakerFilesLoaded])
+sources['index'].load([onIndexFilesLoaded])
+sources['about_modal'].load([onConfigMakerFilesLoaded, onIndexFilesLoaded])
+sources['nav'].load([onAboutFilesLoaded, onConfigMakerFilesLoaded, onIndexFilesLoaded])
+sources['sharedStyles'].load([onAboutFilesLoaded, onConfigMakerFilesLoaded, onIndexFilesLoaded])
+sources['sharedScripts'].load([onConfigMakerFilesLoaded, onIndexFilesLoaded])

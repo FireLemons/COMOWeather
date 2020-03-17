@@ -31,7 +31,6 @@ class SourceFile {
     return this.contents
   }
 
-
   // Returns whether the contents have been loaded
   //   @returns {boolean} True if the contents of the file have been loaded. False otherwise
   isLoaded () {
@@ -68,17 +67,17 @@ class SourceFile {
 
 // Represents a generated file and the source files used to generate it
 class DependencyTree {
-  // @param  {string}     generatedFilePath The path to the file generated
-  // @param  {function}   generationCallback The function to generate the file after all the source files are loaded
+  // @param  {string}        generatedFilePath The path to the file generated
+  // @param  {function}      build The function to generate the file
   // @param  {SourceFile[]}  sources The source files needed to generate a file
-  // @throws {TypeError} when an argument is of the wrong type
-  constructor (generatedFilePath, generationCallback, sources) {
+  // @throws {TypeError}     when an argument is of the wrong type
+  constructor (generatedFilePath, build, sources) {
     if (generatedFilePath !== 'string') {
       throw new TypeError('Param generatedFilePath must be a string')
     }
 
-    if (!(generationCallback instanceof Function)) {
-      throw new TypeError('Param generationCallback must be a function')
+    if (!(build instanceof Function)) {
+      throw new TypeError('Param build must be a function')
     }
 
     if (!(sources instanceof Array)) {
@@ -92,16 +91,19 @@ class DependencyTree {
     }
 
     this.generatedFilePath = generatedFilePath
-    this.generationCallback = generationCallback
+    this.build = build
     this.sources = sources
   }
 
-  isMemberSource (source) {
-    return this.sources.includes(source)
+  // Generates the file if all the sources are loaded
+  generateFile () {
+    if (this.sources.reduce((acc, source) => acc || source.isLoaded(), true)) {
+      this.build()
+    }
   }
 }
 
-let   checkedFileCount = 0
+let checkedFileCount = 0
 const TRACKED_FILE_COUNT = 10
 const trackedFiles = [
   './about.html',
@@ -118,13 +120,18 @@ const trackedFiles = [
 
 const fileLastModifiedTimes = {}
 const sources = {
-  'about': new SourceFile('./templates/about.mustache', 'template'),
-  'configMaker': new SourceFile('./templates/configMaker.mustache', 'template'),
-  'index': new SourceFile('./templates/index.mustache', 'template'),
-  'about_modal': new SourceFile('./templates/about_modal.mustache', 'partial'),
-  'nav': new SourceFile('./templates/nav.mustache', 'partial'),
-  'sharedStyles': new SourceFile('./templates/sharedStyles.mustache', 'partial'),
-  'sharedScripts': new SourceFile('./templates/sharedScripts.mustache', 'partial')
+  about: new SourceFile('./templates/about.mustache', 'template'),
+  configMaker: new SourceFile('./templates/configMaker.mustache', 'template'),
+  index: new SourceFile('./templates/index.mustache', 'template'),
+  about_modal: new SourceFile('./templates/about_modal.mustache', 'partial'),
+  nav: new SourceFile('./templates/nav.mustache', 'partial'),
+  sharedStyles: new SourceFile('./templates/sharedStyles.mustache', 'partial'),
+  sharedScripts: new SourceFile('./templates/sharedScripts.mustache', 'partial')
+}
+const buildTrees = {
+  'about.html': new DependencyTree('./about.html'),
+  'configMaker/index.html': new DependencyTree('./configMaker/index.html'),
+  'index.html': new DependencyTree('./index.html')
 }
 
 // Asynchronously fetches the last modified time for a file and stores it in fileLastModifiedTimes
@@ -225,10 +232,10 @@ trackedFiles.forEach((filePath) => {
   checkLastModifiedTime(filePath)
 })
 
-sources['about'].load([onAboutFilesLoaded])
-sources['configMaker'].load([onConfigMakerFilesLoaded])
-sources['index'].load([onIndexFilesLoaded])
-sources['about_modal'].load([onConfigMakerFilesLoaded, onIndexFilesLoaded])
-sources['nav'].load([onAboutFilesLoaded, onConfigMakerFilesLoaded, onIndexFilesLoaded])
-sources['sharedStyles'].load([onAboutFilesLoaded, onConfigMakerFilesLoaded, onIndexFilesLoaded])
-sources['sharedScripts'].load([onConfigMakerFilesLoaded, onIndexFilesLoaded])
+sources.about.load([onAboutFilesLoaded])
+sources.configMaker.load([onConfigMakerFilesLoaded])
+sources.index.load([onIndexFilesLoaded])
+sources.about_modal.load([onConfigMakerFilesLoaded, onIndexFilesLoaded])
+sources.nav.load([onAboutFilesLoaded, onConfigMakerFilesLoaded, onIndexFilesLoaded])
+sources.sharedStyles.load([onAboutFilesLoaded, onConfigMakerFilesLoaded, onIndexFilesLoaded])
+sources.sharedScripts.load([onConfigMakerFilesLoaded, onIndexFilesLoaded])

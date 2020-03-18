@@ -72,7 +72,7 @@ class DependencyTree {
   // @param  {SourceFile[]}  sources The source files needed to generate a file
   // @throws {TypeError}     when an argument is of the wrong type
   constructor (generatedFilePath, build, sources) {
-    if (generatedFilePath !== 'string') {
+    if (typeof generatedFilePath !== 'string') {
       throw new TypeError('Param generatedFilePath must be a string')
     }
 
@@ -128,10 +128,65 @@ const sources = {
   sharedStyles: new SourceFile('./templates/sharedStyles.mustache', 'partial'),
   sharedScripts: new SourceFile('./templates/sharedScripts.mustache', 'partial')
 }
+
+/*
+ * Functions to generate files
+ */
+
+// Generates about.html
+function buildAboutHTML (sourceFiles) {
+  fs.writeFile('./about.html', Mustache.render(sources.about.getContents(), {
+    'js-possible': false
+  }, {
+    nav: sources.nav.getContents(),
+    'shared-styles': sources.sharedStyles.getContents()
+  })).then(() => {
+    console.log('generated about.html')
+  }).catch((err) => {
+    console.log('ERROR: Failed to generate about.html')
+    console.error(err)
+  })
+}
+
+// Generates configMaker/index.html
+function buildConfigMakerIndexHTML (sourceFiles) {
+  fs.writeFile('./configMaker/index.html', Mustache.render(sources.configMaker.getContents(), {
+    'extended-path': '../',
+    'js-possible': true
+  }, {
+    'about-modal': sources.about_modal.getContents(),
+    nav: sources.nav.getContents(),
+    'shared-styles': sources.sharedStyles.getContents(),
+    'shared-scripts': sources.sharedScripts.getContents()
+  })).then(() => {
+    console.log('generated configMaker/index.html')
+  }).catch((err) => {
+    console.log('ERROR: Failed to generate configMaker/index.html')
+    console.error(err)
+  })
+}
+
+// Generates index.html
+function buildIndexHTML (sourceFiles) {
+  fs.writeFile('./index.html', Mustache.render(sourceFiles.index.getContents(), {
+    'js-possible': true
+  }, {
+    'about-modal': sourceFiles.about_modal.getContents(),
+    nav: sourceFiles.nav.getContents(),
+    'shared-scripts': sourceFiles.sharedScripts.getContents(),
+    'shared-styles': sourceFiles.sharedStyles.getContents()
+  })).then(() => {
+    console.log('generated index.html')
+  }).catch((err) => {
+    console.error('ERROR: Failed to generate index.html')
+    console.error(err)
+  })
+}
+
 const buildTrees = {
-  'about.html': new DependencyTree('./about.html'),
-  'configMaker/index.html': new DependencyTree('./configMaker/index.html'),
-  'index.html': new DependencyTree('./index.html')
+  'about.html': new DependencyTree('./about.html', buildAboutHTML, [sources.about, sources.nav, sources.sharedStyles]),
+  'configMaker/index.html': new DependencyTree('./configMaker/index.html', buildConfigMakerIndexHTML, [sources.configMaker, sources.about_modal, sources.nav, sources.sharedScripts, sources.sharedStyles]),
+  'index.html': new DependencyTree('./index.html', buildIndexHTML, [sources.index, sources.about_modal, sources.nav, sources.sharedScripts, sources.sharedStyles])
 }
 
 // Asynchronously fetches the last modified time for a file and stores it in fileLastModifiedTimes
@@ -152,62 +207,6 @@ function checkLastModifiedTime (path) {
     }).catch((err) => {
       throw err
     })
-}
-
-// Generates about.html if all required source files are loaded
-function onAboutFilesLoaded () {
-  if (sources.about.isLoaded() && sources.nav.isLoaded() && sources.sharedStyles.isLoaded()) {
-    fs.writeFile('./about.html', Mustache.render(sources.about.getContents(), {
-      'js-possible': false
-    }, {
-      nav: sources.nav.getContents(),
-      'shared-styles': sources.sharedStyles.getContents()
-    })).then(() => {
-      console.log('generated about.html')
-    }).catch((err) => {
-      console.log('ERROR: Failed to generate about.html')
-      console.error(err)
-    })
-  }
-}
-
-// Generates configMaker/index.html if all required source files are loaded
-function onConfigMakerFilesLoaded () {
-  if (sources.configMaker.isLoaded() && sources.about_modal.isLoaded() && sources.nav.isLoaded() && sources.sharedScripts.isLoaded() && sources.sharedStyles.isLoaded()) {
-    fs.writeFile('./configMaker/index.html', Mustache.render(sources.configMaker.getContents(), {
-      'extended-path': '../',
-      'js-possible': true
-    }, {
-      'about-modal': sources.about_modal.getContents(),
-      nav: sources.nav.getContents(),
-      'shared-styles': sources.sharedStyles.getContents(),
-      'shared-scripts': sources.sharedScripts.getContents()
-    })).then(() => {
-      console.log('generated configMaker/index.html')
-    }).catch((err) => {
-      console.log('ERROR: Failed to generate configMaker/index.html')
-      console.error(err)
-    })
-  }
-}
-
-// Generates index.html if all required source files are loaded
-function onIndexFilesLoaded () {
-  if (sources.index.isLoaded() && sources.about_modal.isLoaded() && sources.nav.isLoaded() && sources.sharedScripts.isLoaded() && sources.sharedStyles.isLoaded()) {
-    fs.writeFile('./index.html', Mustache.render(sources.index.getContents(), {
-      'js-possible': true
-    }, {
-      'about-modal': sources.about_modal.getContents(),
-      nav: sources.nav.getContents(),
-      'shared-scripts': sources.sharedScripts.getContents(),
-      'shared-styles': sources.sharedStyles.getContents()
-    })).then(() => {
-      console.log('generated index.html')
-    }).catch((err) => {
-      console.error('ERROR: Failed to generate index.html')
-      console.error(err)
-    })
-  }
 }
 
 // Determines which files to generate based on last modified times of files

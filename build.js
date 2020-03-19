@@ -92,7 +92,15 @@ class DependencyTree {
 
     this.generatedFilePath = generatedFilePath
     this.build = build
-    this.sources = sources
+    this.sources = {}
+
+    const fileName = /.*?\/([a-zA-Z_]+)\.[a-z]+/
+
+    sources.forEach((source) => {
+      this.sources[fileName.exec(source.path)[1]] = source
+    })
+
+    console.log(this.sources)
   }
 
   // Generates the file if all the sources are loaded

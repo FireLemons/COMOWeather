@@ -1,4 +1,4 @@
-const fs = require('fs').promises
+const fs = require('fs')
 const Mustache = require('mustache')
 
 console.log('WARNING: Generated files will only be updated if the source files were last modified later than the generated files.')
@@ -52,7 +52,7 @@ class SourceFile {
       })
     }
 
-    fs.readFile(this.path, 'utf8')
+    fs.promises.readFile(this.path, 'utf8')
       .then((contents) => {
         this.contents = contents
 
@@ -99,14 +99,30 @@ class DependencyTree {
     sources.forEach((source) => {
       this.sources[fileName.exec(source.path)[1]] = source
     })
-
-    console.log(this.sources)
   }
 
   // Generates the file if all the sources are loaded
   generateFile () {
     if (this.sources.reduce((acc, source) => acc || source.isLoaded(), true)) {
       this.build()
+    }
+  }
+
+  // Determines whether the generated file is up to date with its source files
+  //  @returns true if the generated file does not exist or is older than a source file. false otherwise
+  isOutdated () {
+    if (!fs.existsSync(this.generatedFilePath)) {
+      return true;
+    } else {
+      let generatedFileLastModifiedTime = fileLastModifiedTimes[this.generatedFilePath]
+
+      for (let source in this.sources) {
+        if (generatedFileLastModifiedTime < fileLastModifiedTimes[this.sources[source].path]) {
+        
+        }
+      }
+
+      return false
     }
   }
 }
@@ -143,7 +159,7 @@ const sources = {
 
 // Generates about.html
 function buildAboutHTML (sourceFiles) {
-  fs.writeFile('./about.html', Mustache.render(sources.about.getContents(), {
+  fs.promises.writeFile('./about.html', Mustache.render(sources.about.getContents(), {
     'js-possible': false
   }, {
     nav: sources.nav.getContents(),
@@ -158,7 +174,7 @@ function buildAboutHTML (sourceFiles) {
 
 // Generates configMaker/index.html
 function buildConfigMakerIndexHTML (sourceFiles) {
-  fs.writeFile('./configMaker/index.html', Mustache.render(sources.configMaker.getContents(), {
+  fs.promises.writeFile('./configMaker/index.html', Mustache.render(sources.configMaker.getContents(), {
     'extended-path': '../',
     'js-possible': true
   }, {
@@ -176,7 +192,7 @@ function buildConfigMakerIndexHTML (sourceFiles) {
 
 // Generates index.html
 function buildIndexHTML (sourceFiles) {
-  fs.writeFile('./index.html', Mustache.render(sourceFiles.index.getContents(), {
+  fs.promises.writeFile('./index.html', Mustache.render(sourceFiles.index.getContents(), {
     'js-possible': true
   }, {
     'about-modal': sourceFiles.about_modal.getContents(),
@@ -197,12 +213,22 @@ const buildTrees = {
   'index.html': new DependencyTree('./index.html', buildIndexHTML, [sources.index, sources.about_modal, sources.nav, sources.sharedScripts, sources.sharedStyles])
 }
 
+// Determines which files to generate based on last modified times of files
+function onLastModifiedTimesCollected () {
+  Object.values(buildTrees).forEach((buildTree) => {
+    console.log(buildTree.isOutdated())
+  })
+}
+
 // Asynchronously fetches the last modified time for a file and stores it in fileLastModifiedTimes
 //   @param  {string}       path The path to the source file to be loaded
-//   @throws {SystemError}  When the file's metadata could not be read
 //   @throws {TypeError}    When path is not a string
 function checkLastModifiedTime (path) {
-  fs.stat(path)
+  if(typeof path !== 'string'){
+    throw new TypeError('Param path must be a string')
+  }
+
+  fs.promises.stat(path)
     .then((stats) => {
       fileLastModifiedTimes[path] = stats.mtimeMs
       checkedFileCount++
@@ -210,27 +236,12 @@ function checkLastModifiedTime (path) {
       if (checkedFileCount > TRACKED_FILE_COUNT) {
         throw new RangeError(`\n\nERROR: More files were asynchronously checked for last modified time than TRACKED_FILE_COUNT(${TRACKED_FILE_COUNT}).\n       The callback for all files checked may not work properly. Was a new file added?\n`)
       } else if (checkedFileCount === TRACKED_FILE_COUNT) {
-        // all files checked callback
+        onLastModifiedTimesCollected()
       }
     }).catch((err) => {
-      throw err
+      checkedFileCount++
+      console.error(err)
     })
-}
-
-// Determines which files to generate based on last modified times of files
-function onLastModifiedTimesCollected () {
-  const requiredSources = {}
-  const aboutTime = fileLastModifiedTimes['./about.html']
-  const aboutTemplateTime = fileLastModifiedTimes['./templates/about.mustache']
-  const navTemplateTime = fileLastModifiedTimes['./templates/nav.mustache']
-
-  if (aboutTemplateTime > aboutTime || navTemplateTime > aboutTime) {
-
-  }
-
-  for (const source in requiredSources) {
-
-  }
 }
 
 // Check last modified times of all files
@@ -239,10 +250,10 @@ trackedFiles.forEach((filePath) => {
   checkLastModifiedTime(filePath)
 })
 
-sources.about.load([onAboutFilesLoaded])
+/*sources.about.load([onAboutFilesLoaded])
 sources.configMaker.load([onConfigMakerFilesLoaded])
 sources.index.load([onIndexFilesLoaded])
 sources.about_modal.load([onConfigMakerFilesLoaded, onIndexFilesLoaded])
 sources.nav.load([onAboutFilesLoaded, onConfigMakerFilesLoaded, onIndexFilesLoaded])
 sources.sharedStyles.load([onAboutFilesLoaded, onConfigMakerFilesLoaded, onIndexFilesLoaded])
-sources.sharedScripts.load([onConfigMakerFilesLoaded, onIndexFilesLoaded])
+sources.sharedScripts.load([onConfigMakerFilesLoaded, onIndexFilesLoaded])*/

@@ -118,7 +118,7 @@ class DependencyTree {
 
       for (let source in this.sources) {
         if (generatedFileLastModifiedTime < fileLastModifiedTimes[this.sources[source].path]) {
-        
+          return true
         }
       }
 

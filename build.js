@@ -106,11 +106,11 @@ class DependencyTree {
   //  @returns true if the generated file does not exist or is older than a source file. false otherwise
   isOutdated () {
     if (!fs.existsSync(this.generatedFilePath)) {
-      return true;
+      return true
     } else {
-      let generatedFileLastModifiedTime = fileLastModifiedTimes[this.generatedFilePath]
+      const generatedFileLastModifiedTime = fileLastModifiedTimes[this.generatedFilePath]
 
-      for (let source in this.sources) {
+      for (const source in this.sources) {
         if (generatedFileLastModifiedTime < fileLastModifiedTimes[this.sources[source].path]) {
           return true
         }
@@ -211,8 +211,8 @@ const buildTrees = {
 function onLastModifiedTimesCollected () {
   Object.values(buildTrees).forEach((buildTree) => {
     if (buildTree.isOutdated()) {
-      for (sourceKey in buildTree.sources) {
-        let source = sources[sourceKey]
+      for (const sourceKey in buildTree.sources) {
+        const source = sources[sourceKey]
         if (source.loadCallbacks) {
           source.loadCallbacks.push(() => { buildTree.generateFile() })
         } else {
@@ -233,7 +233,7 @@ function onLastModifiedTimesCollected () {
 //   @param  {string}       path The path to the source file to be loaded
 //   @throws {TypeError}    When path is not a string
 function checkLastModifiedTime (path) {
-  if(typeof path !== 'string'){
+  if (typeof path !== 'string') {
     throw new TypeError('Param path must be a string')
   }
 
@@ -254,7 +254,6 @@ function checkLastModifiedTime (path) {
 }
 
 // Check last modified times of all files
-
 trackedFiles.forEach((filePath) => {
   checkLastModifiedTime(filePath)
 })

@@ -5,19 +5,13 @@ console.log('WARNING: Generated files will only be updated if the source files w
 
 class SourceFile {
   // @param   {string}    path The path to the source file
-  // @param   {string}    type The type of source file
   // @throws  {TypeError} when an argument is of the wrong type
   constructor (path, type) {
     if (typeof path !== 'string') {
       throw new TypeError('Param path must be a string')
     }
 
-    if (typeof type !== 'string') {
-      throw new TypeError('Param type must be a string')
-    }
-
     this.path = path
-    this.type = type
   }
 
   // Get the contents of the file
@@ -103,8 +97,8 @@ class DependencyTree {
 
   // Generates the file if all the sources are loaded
   generateFile () {
-    if (this.sources.reduce((acc, source) => acc || source.isLoaded(), true)) {
-      this.build()
+    if (Object.values(this.sources).reduce((acc, source) => acc && source.isLoaded(), true)) {
+      this.build(this.sources)
     }
   }
 
@@ -144,13 +138,13 @@ const trackedFiles = [
 
 const fileLastModifiedTimes = {}
 const sources = {
-  about: new SourceFile('./templates/about.mustache', 'template'),
-  configMaker: new SourceFile('./templates/configMaker.mustache', 'template'),
-  index: new SourceFile('./templates/index.mustache', 'template'),
-  about_modal: new SourceFile('./templates/about_modal.mustache', 'partial'),
-  nav: new SourceFile('./templates/nav.mustache', 'partial'),
-  sharedStyles: new SourceFile('./templates/sharedStyles.mustache', 'partial'),
-  sharedScripts: new SourceFile('./templates/sharedScripts.mustache', 'partial')
+  about: new SourceFile('./templates/about.mustache'),
+  configMaker: new SourceFile('./templates/configMaker.mustache'),
+  index: new SourceFile('./templates/index.mustache'),
+  about_modal: new SourceFile('./templates/about_modal.mustache'),
+  nav: new SourceFile('./templates/nav.mustache'),
+  sharedStyles: new SourceFile('./templates/sharedStyles.mustache'),
+  sharedScripts: new SourceFile('./templates/sharedScripts.mustache')
 }
 
 /*
@@ -216,7 +210,22 @@ const buildTrees = {
 // Determines which files to generate based on last modified times of files
 function onLastModifiedTimesCollected () {
   Object.values(buildTrees).forEach((buildTree) => {
-    console.log(buildTree.isOutdated())
+    if (buildTree.isOutdated()) {
+      for (sourceKey in buildTree.sources) {
+        let source = sources[sourceKey]
+        if (source.loadCallbacks) {
+          source.loadCallbacks.push(() => { buildTree.generateFile() })
+        } else {
+          source.loadCallbacks = [() => { buildTree.generateFile() }]
+        }
+      }
+    }
+  })
+
+  Object.values(sources).forEach((source) => {
+    if (source.loadCallbacks) {
+      source.load(source.loadCallbacks)
+    }
   })
 }
 
@@ -250,10 +259,4 @@ trackedFiles.forEach((filePath) => {
   checkLastModifiedTime(filePath)
 })
 
-/*sources.about.load([onAboutFilesLoaded])
-sources.configMaker.load([onConfigMakerFilesLoaded])
-sources.index.load([onIndexFilesLoaded])
-sources.about_modal.load([onConfigMakerFilesLoaded, onIndexFilesLoaded])
-sources.nav.load([onAboutFilesLoaded, onConfigMakerFilesLoaded, onIndexFilesLoaded])
-sources.sharedStyles.load([onAboutFilesLoaded, onConfigMakerFilesLoaded, onIndexFilesLoaded])
-sources.sharedScripts.load([onConfigMakerFilesLoaded, onIndexFilesLoaded])*/
+console.log('Finished generating files')

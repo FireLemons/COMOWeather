@@ -17,8 +17,9 @@
   },
   "homepage": "https://github.com/FireLemons/COMOWeather#readme",
   "devDependencies": {
-    "mustache": "^3.1.0",
-    "nodemon": "^1.19.4"
+    "mustache": "^4.0.1",
+    "nodemon": "^2.0.2",
+    "sass": "^1.26.3"
   },
   "nodemonConfig": {
     "ext": "mustache,js",

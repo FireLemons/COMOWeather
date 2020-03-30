@@ -1,5 +1,6 @@
 const fs = require('fs')
 const Mustache = require('mustache')
+const Sass = require('sass')
 
 console.log('WARNING: Generated files will only be updated if the source files were last modified later than the generated files.')
 
@@ -89,7 +90,7 @@ class DependencyTree {
     this.build = build
     this.sources = {}
 
-    const fileNamePattern = /.*?\/([a-zA-Z_]+)\.[a-z]+/
+    const fileNamePattern = /.*?\/([a-zA-Z_]+\.[a-z]+)/
 
     sources.forEach((source) => {
       this.sources[fileNamePattern.exec(source.path)[1]] = source
@@ -123,7 +124,7 @@ class DependencyTree {
 }
 
 let checkedFileCount = 0
-const TRACKED_FILE_COUNT = 10
+const TRACKED_FILE_COUNT = 12
 const trackedFiles = [
   './about.html',
   './configMaker/index.html',
@@ -134,18 +135,21 @@ const trackedFiles = [
   './templates/about_modal.mustache',
   './templates/nav.mustache',
   './templates/sharedStyles.mustache',
-  './templates/sharedScripts.mustache'
+  './templates/sharedScripts.mustache',
+  './css/configMaker.css',
+  './css/sass/configMaker.scss'
 ]
 
 const fileLastModifiedTimes = {}
 const sources = {
-  about:          new SourceFile('./templates/about.mustache'),
-  configMaker:    new SourceFile('./templates/configMaker.mustache'),
-  index:          new SourceFile('./templates/index.mustache'),
-  about_modal:    new SourceFile('./templates/about_modal.mustache'),
-  nav:            new SourceFile('./templates/nav.mustache'),
-  sharedStyles:   new SourceFile('./templates/sharedStyles.mustache'),
-  sharedScripts:  new SourceFile('./templates/sharedScripts.mustache')
+  'about.mustache':         new SourceFile('./templates/about.mustache'),
+  'configMaker.mustache':   new SourceFile('./templates/configMaker.mustache'),
+  'configMaker.scss':       new SourceFile('./css/sass/configMaker.scss'),
+  'index.mustache':         new SourceFile('./templates/index.mustache'),
+  'about_modal.mustache':   new SourceFile('./templates/about_modal.mustache'),
+  'nav.mustache':           new SourceFile('./templates/nav.mustache'),
+  'sharedStyles.mustache':  new SourceFile('./templates/sharedStyles.mustache'),
+  'sharedScripts.mustache': new SourceFile('./templates/sharedScripts.mustache')
 }
 
 /*
@@ -185,6 +189,17 @@ function buildConfigMakerIndexHTML (sourceFiles) {
   })
 }
 
+// Generates css/configMaker.css
+function buildConfigMakerCSS (sourceFiles) {
+  fs.promises.writeFile('./css/configMaker.css', Sass.renderSync({data: sources['configMaker.scss'].getContents()}).css
+  ).then(() => {
+    console.log('generated css/configMaker.css')
+  }).catch((err) => {
+    console.log('ERROR: Failed to generate css/configMaker.css')
+    console.error(err)
+  })
+}
+
 // Generates index.html
 function buildIndexHTML (sourceFiles) {
   fs.promises.writeFile('./index.html', Mustache.render(sourceFiles.index.getContents(), {
@@ -203,15 +218,17 @@ function buildIndexHTML (sourceFiles) {
 }
 
 const buildTrees = {
-  'about.html':             new DependencyTree('./about.html',             buildAboutHTML,            [sources.about, sources.nav, sources.sharedStyles]),
-  'configMaker/index.html': new DependencyTree('./configMaker/index.html', buildConfigMakerIndexHTML, [sources.configMaker, sources.about_modal, sources.nav, sources.sharedScripts, sources.sharedStyles]),
-  'index.html':             new DependencyTree('./index.html',             buildIndexHTML,            [sources.index, sources.about_modal, sources.nav, sources.sharedScripts, sources.sharedStyles])
+  'about.html':             new DependencyTree('./about.html',             buildAboutHTML,            [sources['about.mustache'], sources['nav.mustache'], sources['sharedStyles.mustache']]),
+  //'configMaker/index.html': new DependencyTree('./configMaker/index.html', buildConfigMakerIndexHTML, [sources.configMaker, sources.about_modal, sources.nav, sources.sharedScripts, sources.sharedStyles]),
+  'css/configMaker.css':    new DependencyTree('./css/configMaker.css',    buildConfigMakerCSS,       [sources['configMaker.scss']]),
+  'index.html':             new DependencyTree('./index.html',             buildIndexHTML,            [sources['index.mustache'], sources['about_modal.mustache'], sources['nav.mustache'], sources['sharedScripts.mustache'], sources['sharedStyles.mustache']])
 }
 
 // Determines which files to generate based on last modified times of files
 function onLastModifiedTimesCollected () {
   Object.values(buildTrees).forEach((buildTree) => {
     if (buildTree.isOutdated()) {
+      console.log(buildTree.generatedFilePath)
       for (const sourceKey in buildTree.sources) {
         const source = sources[sourceKey]
         if (source.loadCallbacks) {

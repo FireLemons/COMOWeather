@@ -64,7 +64,8 @@ class SourceFile {
 // Represents a generated file and the source files used to generate it
 class DependencyTree {
   // @param  {string}        generatedFilePath The path to the file generated
-  // @param  {function}      build The function to generate the file
+  // @param  {function}      build(sourceFiles) The function to generate the file
+  //   @param {SourceFile[]}   sourceFiles the source files needed to generate a file
   // @param  {SourceFile[]}  sources The source files needed to generate a file
   // @throws {TypeError}     when an argument is of the wrong type
   constructor (generatedFilePath, build, sources) {

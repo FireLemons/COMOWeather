@@ -132,7 +132,7 @@ const trackedFiles = [
   './templates/about.mustache',
   './templates/configMaker.mustache',
   './templates/index.mustache',
-  './templates/about_modal.mustache',
+  './templates/aboutModal.mustache',
   './templates/nav.mustache',
   './templates/sharedStyles.mustache',
   './templates/sharedScripts.mustache',
@@ -146,7 +146,7 @@ const sources = {
   'configMaker.mustache':   new SourceFile('./templates/configMaker.mustache'),
   'configMaker.scss':       new SourceFile('./css/sass/configMaker.scss'),
   'index.mustache':         new SourceFile('./templates/index.mustache'),
-  'about_modal.mustache':   new SourceFile('./templates/about_modal.mustache'),
+  'aboutModal.mustache':    new SourceFile('./templates/aboutModal.mustache'),
   'nav.mustache':           new SourceFile('./templates/nav.mustache'),
   'sharedStyles.mustache':  new SourceFile('./templates/sharedStyles.mustache'),
   'sharedScripts.mustache': new SourceFile('./templates/sharedScripts.mustache')
@@ -158,11 +158,11 @@ const sources = {
 
 // Generates about.html
 function buildAboutHTML (sourceFiles) {
-  fs.promises.writeFile('./about.html', Mustache.render(sources.about.getContents(), {
+  fs.promises.writeFile('./about.html', Mustache.render(sources['about.mustache'].getContents(), {
     'js-possible':    false
   }, {
-    'nav':            sources.nav.getContents(),
-    'shared-styles':  sources.sharedStyles.getContents()
+    'nav':          sources['nav.mustache'].getContents(),
+    'sharedStyles': sources['sharedStyles.mustache'].getContents()
   })).then(() => {
     console.log('generated about.html')
   }).catch((err) => {
@@ -173,14 +173,14 @@ function buildAboutHTML (sourceFiles) {
 
 // Generates configMaker/index.html
 function buildConfigMakerIndexHTML (sourceFiles) {
-  fs.promises.writeFile('./configMaker/index.html', Mustache.render(sources.configMaker.getContents(), {
+  fs.promises.writeFile('./configMaker/index.html', Mustache.render(sources['configMaker.mustache'].getContents(), {
     'extended-path':  '../',
     'js-possible':    true
   }, {
-    'about-modal':    sources.about_modal.getContents(),
-    'nav':            sources.nav.getContents(),
-    'shared-styles':  sources.sharedStyles.getContents(),
-    'shared-scripts': sources.sharedScripts.getContents()
+    'aboutModal':    sources['aboutModal.mustache'].getContents(),
+    'nav':           sources['nav.mustache'].getContents(),
+    'sharedStyles':  sources['sharedStyles.mustache'].getContents(),
+    'sharedScripts': sources['sharedScripts.mustache'].getContents()
   })).then(() => {
     console.log('generated configMaker/index.html')
   }).catch((err) => {
@@ -202,13 +202,13 @@ function buildConfigMakerCSS (sourceFiles) {
 
 // Generates index.html
 function buildIndexHTML (sourceFiles) {
-  fs.promises.writeFile('./index.html', Mustache.render(sourceFiles.index.getContents(), {
+  fs.promises.writeFile('./index.html', Mustache.render(sourceFiles['index.mustache'].getContents(), {
     'js-possible':    true
   }, {
-    'about-modal':    sourceFiles.about_modal.getContents(),
-    'nav':            sourceFiles.nav.getContents(),
-    'shared-scripts': sourceFiles.sharedScripts.getContents(),
-    'shared-styles':  sourceFiles.sharedStyles.getContents()
+    'aboutModal':     sourceFiles['aboutModal.mustache'].getContents(),
+    'nav':            sourceFiles['nav.mustache'].getContents(),
+    'sharedScripts':  sourceFiles['sharedScripts.mustache'].getContents(),
+    'sharedStyles':   sourceFiles['sharedStyles.mustache'].getContents()
   })).then(() => {
     console.log('generated index.html')
   }).catch((err) => {
@@ -219,16 +219,15 @@ function buildIndexHTML (sourceFiles) {
 
 const buildTrees = {
   'about.html':             new DependencyTree('./about.html',             buildAboutHTML,            [sources['about.mustache'], sources['nav.mustache'], sources['sharedStyles.mustache']]),
-  //'configMaker/index.html': new DependencyTree('./configMaker/index.html', buildConfigMakerIndexHTML, [sources.configMaker, sources.about_modal, sources.nav, sources.sharedScripts, sources.sharedStyles]),
+  'configMaker/index.html': new DependencyTree('./configMaker/index.html', buildConfigMakerIndexHTML, [sources['configMaker.mustache'], sources['aboutModal.mustache'], sources['nav.mustache'], sources['sharedScripts.mustache'], sources['sharedStyles.mustache']]),
   'css/configMaker.css':    new DependencyTree('./css/configMaker.css',    buildConfigMakerCSS,       [sources['configMaker.scss']]),
-  'index.html':             new DependencyTree('./index.html',             buildIndexHTML,            [sources['index.mustache'], sources['about_modal.mustache'], sources['nav.mustache'], sources['sharedScripts.mustache'], sources['sharedStyles.mustache']])
+  'index.html':             new DependencyTree('./index.html',             buildIndexHTML,            [sources['index.mustache'], sources['aboutModal.mustache'], sources['nav.mustache'], sources['sharedScripts.mustache'], sources['sharedStyles.mustache']])
 }
 
 // Determines which files to generate based on last modified times of files
 function onLastModifiedTimesCollected () {
   Object.values(buildTrees).forEach((buildTree) => {
     if (buildTree.isOutdated()) {
-      console.log(buildTree.generatedFilePath)
       for (const sourceKey in buildTree.sources) {
         const source = sources[sourceKey]
         if (source.loadCallbacks) {
@@ -245,6 +244,8 @@ function onLastModifiedTimesCollected () {
       source.load(source.loadCallbacks)
     }
   })
+  
+  console.log('Finished generating files')
 }
 
 // Asynchronously fetches the last modified time for a file and stores it in fileLastModifiedTimes
@@ -276,4 +277,3 @@ trackedFiles.forEach((filePath) => {
   checkLastModifiedTime(filePath)
 })
 
-console.log('Finished generating files')

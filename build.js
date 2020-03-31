@@ -64,7 +64,8 @@ class SourceFile {
 // Represents a generated file and the source files used to generate it
 class DependencyTree {
   // @param  {string}        generatedFilePath The path to the file generated
-  // @param  {function}      build(sourceFiles) The function to generate the file
+  // @param  {function}      build(generatedFilePath, sourceFiles) The function to generate the file
+  //   @param {string}         generatedFilePath the path to the file to be generated
   //   @param {SourceFile[]}   sourceFiles the source files needed to generate a file
   // @param  {SourceFile[]}  sources The source files needed to generate a file
   // @throws {TypeError}     when an argument is of the wrong type
@@ -101,7 +102,7 @@ class DependencyTree {
   // Generates the file if all the sources are loaded
   generateFile () {
     if (Object.values(this.sources).reduce((acc, source) => acc && source.isLoaded(), true)) {
-      this.build(this.sources)
+      this.build(this.generatedFilePath, this.sources)
     }
   }
 
@@ -158,8 +159,8 @@ const sources = {
  */
 
 // Generates about.html
-function buildAboutHTML (sourceFiles) {
-  fs.promises.writeFile('./about.html', Mustache.render(sources['about.mustache'].getContents(), {
+function buildAboutHTML (generatedFilePath, sourceFiles) {
+  fs.promises.writeFile(generatedFilePath, Mustache.render(sources['about.mustache'].getContents(), {
     'js-possible':    false
   }, {
     'nav':          sources['nav.mustache'].getContents(),
@@ -173,8 +174,8 @@ function buildAboutHTML (sourceFiles) {
 }
 
 // Generates configMaker/index.html
-function buildConfigMakerIndexHTML (sourceFiles) {
-  fs.promises.writeFile('./configMaker/index.html', Mustache.render(sources['configMaker.mustache'].getContents(), {
+function buildConfigMakerIndexHTML (generatedFilePath, sourceFiles) {
+  fs.promises.writeFile(generatedFilePath, Mustache.render(sources['configMaker.mustache'].getContents(), {
     'extended-path':  '../',
     'js-possible':    true
   }, {
@@ -191,8 +192,8 @@ function buildConfigMakerIndexHTML (sourceFiles) {
 }
 
 // Generates css/configMaker.css
-function buildConfigMakerCSS (sourceFiles) {
-  fs.promises.writeFile('./css/configMaker.css', Sass.renderSync({data: sources['configMaker.scss'].getContents()}).css
+function buildConfigMakerCSS (generatedFilePath, sourceFiles) {
+  fs.promises.writeFile(generatedFilePath, Sass.renderSync({data: sources['configMaker.scss'].getContents()}).css
   ).then(() => {
     console.log('generated css/configMaker.css')
   }).catch((err) => {
@@ -202,8 +203,8 @@ function buildConfigMakerCSS (sourceFiles) {
 }
 
 // Generates index.html
-function buildIndexHTML (sourceFiles) {
-  fs.promises.writeFile('./index.html', Mustache.render(sourceFiles['index.mustache'].getContents(), {
+function buildIndexHTML (generatedFilePath, sourceFiles) {
+  fs.promises.writeFile(generatedFilePath, Mustache.render(sourceFiles['index.mustache'].getContents(), {
     'js-possible':    true
   }, {
     'aboutModal':     sourceFiles['aboutModal.mustache'].getContents(),

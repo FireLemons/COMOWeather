@@ -66,10 +66,12 @@ class DependencyTree {
   // @param  {string}        generatedFilePath The path to the file generated
   // @param  {function}      build(generatedFilePath, sourceFiles) The function to generate the file
   //   @param {string}         generatedFilePath the path to the file to be generated
-  //   @param {SourceFile[]}   sourceFiles the source files needed to generate a file
-  // @param  {SourceFile[]}  sources The source files needed to generate a file
+  //   @param {SourceFile}     primarySource The source that references all other sources
+  //   @param {object}         sourceFiles The source files referenced by the primary source in an object where the key for the source is the name of the source file excluding its extension
+  //  @param {SourceFile}    primarySource The source that references all other sources
+  // @param  {SourceFile[]}  secondarySources The source files referenced by the primary source
   // @throws {TypeError}     when an argument is of the wrong type
-  constructor (generatedFilePath, build, sources) {
+  constructor (generatedFilePath, build, primarySource, secondarySources) {
     if (typeof generatedFilePath !== 'string') {
       throw new TypeError('Param generatedFilePath must be a string')
     }
@@ -78,31 +80,43 @@ class DependencyTree {
       throw new TypeError('Param build must be a function')
     }
 
-    if (!(sources instanceof Array)) {
-      throw new TypeError('Param sources must be an Array')
+    if (!(primarySource instanceof SourceFile)) {
+      throw new TypeError('Param primarySource must be a SourceFile')
+    }
+
+    if (!(secondarySources instanceof Array)) {
+      throw new TypeError('Param secondarySources must be an Array')
     } else {
-      sources.forEach((source) => {
+      secondarySources.forEach((source) => {
         if (!(source instanceof SourceFile)) {
-          throw new TypeError('Param sources can only contain SourceFile objects')
+          throw new TypeError('Param secondarySources can only contain SourceFile objects')
         }
       })
     }
 
     this.generatedFilePath = generatedFilePath
     this.build = build
-    this.sources = {}
+    this.primarySource = primarySource
+    this.secondarySources = {}
 
-    const fileNamePattern = /.*?\/([a-zA-Z_]+\.[a-z]+)/
+    const fileNamePattern = /.*?\/([a-zA-Z_]+)\.[a-z]+/
 
-    sources.forEach((source) => {
-      this.sources[fileNamePattern.exec(source.path)[1]] = source
+    secondarySources.forEach((source) => {
+      this.secondarySources[fileNamePattern.exec(source.path)[1]] = source
     })
   }
 
   // Generates the file if all the sources are loaded
   generateFile () {
-    if (Object.values(this.sources).reduce((acc, source) => acc && source.isLoaded(), true)) {
-      this.build(this.generatedFilePath, this.sources)
+    const secondarySources = this.secondarySources
+
+    if (this.primarySource.isLoaded() && Object.values(secondarySources).reduce((acc, source) => acc && source.isLoaded(), true)) {
+      // Map sources to source file contents in secondarySources object
+      for (let sourceKey in secondarySources) {
+        secondarySources[sourceKey] = secondarySources[sourceKey].getContents()
+      }
+
+      this.build(this.generatedFilePath, this.primarySource, secondarySources)
     }
   }
 
@@ -114,8 +128,12 @@ class DependencyTree {
     } else {
       const generatedFileLastModifiedTime = fileLastModifiedTimes[this.generatedFilePath]
 
-      for (const source in this.sources) {
-        if (generatedFileLastModifiedTime < fileLastModifiedTimes[this.sources[source].path]) {
+      if (generatedFileLastModifiedTime < fileLastModifiedTimes[this.primarySource.path]) {
+        return true
+      }
+
+      for (const source in this.secondarySources) {
+        if (generatedFileLastModifiedTime < fileLastModifiedTimes[this.secondarySources[source].path]) {
           return true
         }
       }
@@ -159,13 +177,10 @@ const sources = {
  */
 
 // Generates about.html
-function buildAboutHTML (generatedFilePath, sourceFiles) {
-  fs.promises.writeFile(generatedFilePath, Mustache.render(sources['about.mustache'].getContents(), {
+function buildAboutHTML (generatedFilePath, primarySource, secondarySources) {
+  fs.promises.writeFile(generatedFilePath, Mustache.render(primarySource.getContents(), {
     'js-possible':    false
-  }, {
-    'nav':          sources['nav.mustache'].getContents(),
-    'sharedStyles': sources['sharedStyles.mustache'].getContents()
-  })).then(() => {
+  }, secondarySources)).then(() => {
     console.log('generated about.html')
   }).catch((err) => {
     console.log('ERROR: Failed to generate about.html')
@@ -174,16 +189,11 @@ function buildAboutHTML (generatedFilePath, sourceFiles) {
 }
 
 // Generates configMaker/index.html
-function buildConfigMakerIndexHTML (generatedFilePath, sourceFiles) {
-  fs.promises.writeFile(generatedFilePath, Mustache.render(sources['configMaker.mustache'].getContents(), {
+function buildConfigMakerIndexHTML (generatedFilePath, primarySource, secondarySources) {
+  fs.promises.writeFile(generatedFilePath, Mustache.render(primarySource.getContents(), {
     'extended-path':  '../',
     'js-possible':    true
-  }, {
-    'aboutModal':    sources['aboutModal.mustache'].getContents(),
-    'nav':           sources['nav.mustache'].getContents(),
-    'sharedStyles':  sources['sharedStyles.mustache'].getContents(),
-    'sharedScripts': sources['sharedScripts.mustache'].getContents()
-  })).then(() => {
+  }, secondarySources)).then(() => {
     console.log('generated configMaker/index.html')
   }).catch((err) => {
     console.log('ERROR: Failed to generate configMaker/index.html')
@@ -192,8 +202,8 @@ function buildConfigMakerIndexHTML (generatedFilePath, sourceFiles) {
 }
 
 // Generates css/configMaker.css
-function buildConfigMakerCSS (generatedFilePath, sourceFiles) {
-  fs.promises.writeFile(generatedFilePath, Sass.renderSync({data: sources['configMaker.scss'].getContents()}).css
+function buildConfigMakerCSS (generatedFilePath, primarySource, secondarySources) {
+  fs.promises.writeFile(generatedFilePath, Sass.renderSync({data: primarySource.getContents()}).css
   ).then(() => {
     console.log('generated css/configMaker.css')
   }).catch((err) => {
@@ -203,15 +213,10 @@ function buildConfigMakerCSS (generatedFilePath, sourceFiles) {
 }
 
 // Generates index.html
-function buildIndexHTML (generatedFilePath, sourceFiles) {
-  fs.promises.writeFile(generatedFilePath, Mustache.render(sourceFiles['index.mustache'].getContents(), {
+function buildIndexHTML (generatedFilePath, primarySource, secondarySources) {
+  fs.promises.writeFile(generatedFilePath, Mustache.render(primarySource.getContents(), {
     'js-possible':    true
-  }, {
-    'aboutModal':     sourceFiles['aboutModal.mustache'].getContents(),
-    'nav':            sourceFiles['nav.mustache'].getContents(),
-    'sharedScripts':  sourceFiles['sharedScripts.mustache'].getContents(),
-    'sharedStyles':   sourceFiles['sharedStyles.mustache'].getContents()
-  })).then(() => {
+  }, secondarySources)).then(() => {
     console.log('generated index.html')
   }).catch((err) => {
     console.error('ERROR: Failed to generate index.html')
@@ -219,25 +224,52 @@ function buildIndexHTML (generatedFilePath, sourceFiles) {
   })
 }
 
-const buildTrees = {
-  'about.html':             new DependencyTree('./about.html',             buildAboutHTML,            [sources['about.mustache'], sources['nav.mustache'], sources['sharedStyles.mustache']]),
-  'configMaker/index.html': new DependencyTree('./configMaker/index.html', buildConfigMakerIndexHTML, [sources['configMaker.mustache'], sources['aboutModal.mustache'], sources['nav.mustache'], sources['sharedScripts.mustache'], sources['sharedStyles.mustache']]),
-  'css/configMaker.css':    new DependencyTree('./css/configMaker.css',    buildConfigMakerCSS,       [sources['configMaker.scss']]),
-  'index.html':             new DependencyTree('./index.html',             buildIndexHTML,            [sources['index.mustache'], sources['aboutModal.mustache'], sources['nav.mustache'], sources['sharedScripts.mustache'], sources['sharedStyles.mustache']])
-}
+const buildTrees = [
+  new DependencyTree(
+    './about.html',
+    buildAboutHTML,
+    sources['about.mustache'],
+    [sources['nav.mustache'], sources['sharedStyles.mustache']]
+  ),
+  new DependencyTree(
+    './configMaker/index.html',
+    buildConfigMakerIndexHTML,
+    sources['configMaker.mustache'],
+    [sources['aboutModal.mustache'], sources['nav.mustache'], sources['sharedScripts.mustache'], sources['sharedStyles.mustache']]
+  ),
+  new DependencyTree(
+    './css/configMaker.css',
+    buildConfigMakerCSS,
+    sources['configMaker.scss'],
+    []
+  ),
+  new DependencyTree(
+    './index.html',
+    buildIndexHTML,
+    sources['index.mustache'],
+    [sources['aboutModal.mustache'], sources['nav.mustache'], sources['sharedScripts.mustache'], sources['sharedStyles.mustache']]
+  )
+]
 
 // Determines which files to generate based on last modified times of files
 function onLastModifiedTimesCollected () {
-  Object.values(buildTrees).forEach((buildTree) => {
+  buildTrees.forEach((buildTree) => {
     if (buildTree.isOutdated()) {
-      for (const sourceKey in buildTree.sources) {
-        const source = sources[sourceKey]
+      const primarySource = buildTree.primarySource
+
+      if (primarySource.loadCallbacks) {
+        primarySource.loadCallbacks.push(() => { buildTree.generateFile() })
+      } else {
+        primarySource.loadCallbacks = [() => { buildTree.generateFile() }]
+      }
+
+      Object.values(buildTree.secondarySources).forEach((source) => {
         if (source.loadCallbacks) {
           source.loadCallbacks.push(() => { buildTree.generateFile() })
         } else {
           source.loadCallbacks = [() => { buildTree.generateFile() }]
         }
-      }
+      })
     }
   })
 

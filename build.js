@@ -64,14 +64,15 @@ class SourceFile {
 // Represents a generated file and the source files used to generate it
 class DependencyTree {
   // @param  {string}        generatedFilePath The path to the file generated
+  // @param {SourceFile}    primarySource The source that references all other sources
+  // @param  {SourceFile[]}  secondarySources The source files referenced by the primary source
   // @param  {function}      build(generatedFilePath, sourceFiles) The function to generate the file
   //   @param {string}         generatedFilePath the path to the file to be generated
   //   @param {SourceFile}     primarySource The source that references all other sources
   //   @param {object}         sourceFiles The source files referenced by the primary source in an object where the key for the source is the name of the source file excluding its extension
-  //  @param {SourceFile}    primarySource The source that references all other sources
-  // @param  {SourceFile[]}  secondarySources The source files referenced by the primary source
+  // @param  {object}        buildOptions Additional arguments to be passed to the build function
   // @throws {TypeError}     when an argument is of the wrong type
-  constructor (generatedFilePath, build, primarySource, secondarySources) {
+  constructor (generatedFilePath, primarySource, secondarySources, build, buildOptions) {
     if (typeof generatedFilePath !== 'string') {
       throw new TypeError('Param generatedFilePath must be a string')
     }
@@ -95,17 +96,19 @@ class DependencyTree {
     }
 
     this.generatedFilePath = generatedFilePath
-    this.build = build
     this.primarySource = primarySource
     this.secondarySources = secondarySources
+    this.build = build
+    this.buildOptions = buildOptions
   }
 
   // Generates the file if all the sources are loaded
   generateFile () {
+    const primarySource = this.primarySource
     const secondarySources = this.secondarySources
 
-    if (this.primarySource.isLoaded() && Object.values(secondarySources).reduce((acc, source) => acc && source.isLoaded(), true)) {
-      this.build(this.generatedFilePath, this.primarySource, secondarySources)
+    if (primarySource.isLoaded() && secondarySources.reduce((acc, source) => acc && source.isLoaded(), true)) {
+      this.build(this.generatedFilePath, primarySource, secondarySources)
     }
   }
 
@@ -236,27 +239,27 @@ function buildIndexHTML (generatedFilePath, primarySource, secondarySources) {
 const buildTrees = [
   new DependencyTree(
     './about.html',
-    buildAboutHTML,
     sources['about.mustache'],
-    [sources['nav.mustache'], sources['sharedStyles.mustache']]
+    [sources['nav.mustache'], sources['sharedStyles.mustache']],
+    buildAboutHTML
   ),
   new DependencyTree(
     './configMaker/index.html',
-    buildConfigMakerIndexHTML,
     sources['configMaker.mustache'],
-    [sources['aboutModal.mustache'], sources['nav.mustache'], sources['sharedScripts.mustache'], sources['sharedStyles.mustache']]
+    [sources['aboutModal.mustache'], sources['nav.mustache'], sources['sharedScripts.mustache'], sources['sharedStyles.mustache']],
+    buildConfigMakerIndexHTML
   ),
   new DependencyTree(
     './css/configMaker.css',
-    buildConfigMakerCSS,
     sources['configMaker.scss'],
-    []
+    [],
+    buildConfigMakerCSS
   ),
   new DependencyTree(
     './index.html',
-    buildIndexHTML,
     sources['index.mustache'],
-    [sources['aboutModal.mustache'], sources['nav.mustache'], sources['sharedScripts.mustache'], sources['sharedStyles.mustache']]
+    [sources['aboutModal.mustache'], sources['nav.mustache'], sources['sharedScripts.mustache'], sources['sharedStyles.mustache']],
+    buildIndexHTML
   )
 ]
 

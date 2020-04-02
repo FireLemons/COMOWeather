@@ -97,13 +97,7 @@ class DependencyTree {
     this.generatedFilePath = generatedFilePath
     this.build = build
     this.primarySource = primarySource
-    this.secondarySources = {}
-
-    const fileNamePattern = /.*?\/([a-zA-Z_]+)\.[a-z]+/
-
-    secondarySources.forEach((source) => {
-      this.secondarySources[fileNamePattern.exec(source.path)[1]] = source
-    })
+    this.secondarySources = secondarySources
   }
 
   // Generates the file if all the sources are loaded
@@ -111,11 +105,6 @@ class DependencyTree {
     const secondarySources = this.secondarySources
 
     if (this.primarySource.isLoaded() && Object.values(secondarySources).reduce((acc, source) => acc && source.isLoaded(), true)) {
-      // Map sources to source file contents in secondarySources object
-      for (let sourceKey in secondarySources) {
-        secondarySources[sourceKey] = secondarySources[sourceKey].getContents()
-      }
-
       this.build(this.generatedFilePath, this.primarySource, secondarySources)
     }
   }
@@ -176,11 +165,19 @@ const sources = {
  * Functions to generate files
  */
 
+const fileNamePattern = /.*?\/([a-zA-Z_]+)\.[a-z]+/
+
 // Generates about.html
 function buildAboutHTML (generatedFilePath, primarySource, secondarySources) {
+  let secondarySourcesAsObject = {}
+
+  secondarySources.forEach((source) => {
+    secondarySourcesAsObject[fileNamePattern.exec(source.path)[1]] = source.getContents()
+  })
+
   fs.promises.writeFile(generatedFilePath, Mustache.render(primarySource.getContents(), {
     'js-possible':    false
-  }, secondarySources)).then(() => {
+  }, secondarySourcesAsObject)).then(() => {
     console.log('generated about.html')
   }).catch((err) => {
     console.log('ERROR: Failed to generate about.html')
@@ -190,10 +187,16 @@ function buildAboutHTML (generatedFilePath, primarySource, secondarySources) {
 
 // Generates configMaker/index.html
 function buildConfigMakerIndexHTML (generatedFilePath, primarySource, secondarySources) {
+  let secondarySourcesAsObject = {}
+
+  secondarySources.forEach((source) => {
+    secondarySourcesAsObject[fileNamePattern.exec(source.path)[1]] = source.getContents()
+  })
+
   fs.promises.writeFile(generatedFilePath, Mustache.render(primarySource.getContents(), {
     'extended-path':  '../',
     'js-possible':    true
-  }, secondarySources)).then(() => {
+  }, secondarySourcesAsObject)).then(() => {
     console.log('generated configMaker/index.html')
   }).catch((err) => {
     console.log('ERROR: Failed to generate configMaker/index.html')
@@ -214,9 +217,15 @@ function buildConfigMakerCSS (generatedFilePath, primarySource, secondarySources
 
 // Generates index.html
 function buildIndexHTML (generatedFilePath, primarySource, secondarySources) {
+  let secondarySourcesAsObject = {}
+
+  secondarySources.forEach((source) => {
+    secondarySourcesAsObject[fileNamePattern.exec(source.path)[1]] = source.getContents()
+  })
+
   fs.promises.writeFile(generatedFilePath, Mustache.render(primarySource.getContents(), {
     'js-possible':    true
-  }, secondarySources)).then(() => {
+  }, secondarySourcesAsObject)).then(() => {
     console.log('generated index.html')
   }).catch((err) => {
     console.error('ERROR: Failed to generate index.html')
@@ -263,7 +272,7 @@ function onLastModifiedTimesCollected () {
         primarySource.loadCallbacks = [() => { buildTree.generateFile() }]
       }
 
-      Object.values(buildTree.secondarySources).forEach((source) => {
+      buildTree.secondarySources.forEach((source) => {
         if (source.loadCallbacks) {
           source.loadCallbacks.push(() => { buildTree.generateFile() })
         } else {

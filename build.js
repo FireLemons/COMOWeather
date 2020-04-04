@@ -138,33 +138,27 @@ class DependencyTree {
 
 let checkedFileCount = 0
 const TRACKED_FILE_COUNT = 12
-const trackedFiles = [
-  './about.html',
-  './configMaker/index.html',
-  './index.html',
-  './templates/about.mustache',
-  './templates/configMaker.mustache',
-  './templates/index.mustache',
-  './templates/aboutModal.mustache',
-  './templates/nav.mustache',
-  './templates/sharedStyles.mustache',
-  './templates/sharedScripts.mustache',
-  './css/configMaker.css',
-  './css/sass/configMaker.scss'
-]
-
-const fileLastModifiedTimes = {}
-const sources = {
-  'about.mustache':         new SourceFile('./templates/about.mustache'),
-  'configMaker.mustache':   new SourceFile('./templates/configMaker.mustache'),
-  'configMaker.scss':       new SourceFile('./css/sass/configMaker.scss'),
-  'index.mustache':         new SourceFile('./templates/index.mustache'),
-  'aboutModal.mustache':    new SourceFile('./templates/aboutModal.mustache'),
-  'nav.mustache':           new SourceFile('./templates/nav.mustache'),
-  'sharedStyles.mustache':  new SourceFile('./templates/sharedStyles.mustache'),
-  'sharedScripts.mustache': new SourceFile('./templates/sharedScripts.mustache')
+const trackedFiles = {
+  sources: {
+    'about.mustache':         new SourceFile('./templates/about.mustache'),
+    'configMaker.mustache':   new SourceFile('./templates/configMaker.mustache'),
+    'configMaker.scss':       new SourceFile('./css/sass/configMaker.scss'),
+    'index.mustache':         new SourceFile('./templates/index.mustache'),
+    'aboutModal.mustache':    new SourceFile('./templates/aboutModal.mustache'),
+    'nav.mustache':           new SourceFile('./templates/nav.mustache'),
+    'sharedStyles.mustache':  new SourceFile('./templates/sharedStyles.mustache'),
+    'sharedScripts.mustache': new SourceFile('./templates/sharedScripts.mustache')
+  },
+  generatedFiles: [
+    './about.html',
+    './configMaker/index.html',
+    './index.html',
+    './css/configMaker.css'
+  ]
 }
 
+const fileLastModifiedTimes = {}
+const sources = trackedFiles.sources
 /*
  * Functions to generate files
  */
@@ -299,12 +293,16 @@ function checkLastModifiedTime (path) {
       }
     }).catch((err) => {
       checkedFileCount++
-      console.error(err)
+      console.warn(err)
     })
 }
 
 // Check last modified times of all files
-trackedFiles.forEach((filePath) => {
+Object.values(sources).map((source) => source.path).forEach((filePath) => {
+  checkLastModifiedTime(filePath)
+})
+
+trackedFiles.generatedFiles.forEach((filePath) => {
   checkLastModifiedTime(filePath)
 })
 

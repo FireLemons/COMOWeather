@@ -70,6 +70,7 @@ class DependencyTree {
   //   @param {string}         generatedFilePath the path to the file to be generated
   //   @param {SourceFile}     primarySource The source that references all other sources
   //   @param {object}         sourceFiles The source files referenced by the primary source in an object where the key for the source is the name of the source file excluding its extension
+  //   @param {object}         buildOptions Additional arguments for generating the file
   // @param  {object}        buildOptions Additional arguments to be passed to the build function
   // @throws {TypeError}     when an argument is of the wrong type
   constructor (generatedFilePath, primarySource, secondarySources, build, buildOptions) {
@@ -108,7 +109,7 @@ class DependencyTree {
     const secondarySources = this.secondarySources
 
     if (primarySource.isLoaded() && secondarySources.reduce((acc, source) => acc && source.isLoaded(), true)) {
-      this.build(this.generatedFilePath, primarySource, secondarySources)
+      this.build(this.generatedFilePath, primarySource, secondarySources, this.buildOptions)
     }
   }
 
@@ -170,39 +171,18 @@ const sources = {
 
 const fileNamePattern = /.*?\/([a-zA-Z_]+)\.[a-z]+/
 
-// Generates about.html
-function buildAboutHTML (generatedFilePath, primarySource, secondarySources) {
+// Generates HTML files from Mustache templates
+function buildHTML (generatedFilePath, primarySource, secondarySources, buildOptions) {
   let secondarySourcesAsObject = {}
 
   secondarySources.forEach((source) => {
     secondarySourcesAsObject[fileNamePattern.exec(source.path)[1]] = source.getContents()
   })
 
-  fs.promises.writeFile(generatedFilePath, Mustache.render(primarySource.getContents(), {
-    'js-possible':    false
-  }, secondarySourcesAsObject)).then(() => {
-    console.log('generated about.html')
+  fs.promises.writeFile(generatedFilePath, Mustache.render(primarySource.getContents(), buildOptions, secondarySourcesAsObject)).then(() => {
+    console.log(`generated ${generatedFilePath}`)
   }).catch((err) => {
-    console.log('ERROR: Failed to generate about.html')
-    console.error(err)
-  })
-}
-
-// Generates configMaker/index.html
-function buildConfigMakerIndexHTML (generatedFilePath, primarySource, secondarySources) {
-  let secondarySourcesAsObject = {}
-
-  secondarySources.forEach((source) => {
-    secondarySourcesAsObject[fileNamePattern.exec(source.path)[1]] = source.getContents()
-  })
-
-  fs.promises.writeFile(generatedFilePath, Mustache.render(primarySource.getContents(), {
-    'extended-path':  '../',
-    'js-possible':    true
-  }, secondarySourcesAsObject)).then(() => {
-    console.log('generated configMaker/index.html')
-  }).catch((err) => {
-    console.log('ERROR: Failed to generate configMaker/index.html')
+    console.log(`ERROR: Failed to generate ${generatedFilePath}`)
     console.error(err)
   })
 }
@@ -218,36 +198,33 @@ function buildConfigMakerCSS (generatedFilePath, primarySource, secondarySources
   })
 }
 
-// Generates index.html
-function buildIndexHTML (generatedFilePath, primarySource, secondarySources) {
-  let secondarySourcesAsObject = {}
-
-  secondarySources.forEach((source) => {
-    secondarySourcesAsObject[fileNamePattern.exec(source.path)[1]] = source.getContents()
-  })
-
-  fs.promises.writeFile(generatedFilePath, Mustache.render(primarySource.getContents(), {
-    'js-possible':    true
-  }, secondarySourcesAsObject)).then(() => {
-    console.log('generated index.html')
-  }).catch((err) => {
-    console.error('ERROR: Failed to generate index.html')
-    console.error(err)
-  })
-}
-
 const buildTrees = [
   new DependencyTree(
     './about.html',
     sources['about.mustache'],
-    [sources['nav.mustache'], sources['sharedStyles.mustache']],
-    buildAboutHTML
+    [
+      sources['nav.mustache'],
+      sources['sharedStyles.mustache']
+    ],
+    buildHTML,
+    {
+      'js-possible': false
+    }
   ),
   new DependencyTree(
     './configMaker/index.html',
     sources['configMaker.mustache'],
-    [sources['aboutModal.mustache'], sources['nav.mustache'], sources['sharedScripts.mustache'], sources['sharedStyles.mustache']],
-    buildConfigMakerIndexHTML
+    [
+      sources['aboutModal.mustache'],
+      sources['nav.mustache'],
+      sources['sharedScripts.mustache'],
+      sources['sharedStyles.mustache']
+    ],
+    buildHTML,
+    {
+      'extended-path':  '../',
+      'js-possible':    true
+    }
   ),
   new DependencyTree(
     './css/configMaker.css',
@@ -258,8 +235,16 @@ const buildTrees = [
   new DependencyTree(
     './index.html',
     sources['index.mustache'],
-    [sources['aboutModal.mustache'], sources['nav.mustache'], sources['sharedScripts.mustache'], sources['sharedStyles.mustache']],
-    buildIndexHTML
+    [
+      sources['aboutModal.mustache'],
+      sources['nav.mustache'],
+      sources['sharedScripts.mustache'],
+      sources['sharedStyles.mustache']
+    ],
+    buildHTML,
+    {
+      'js-possible': true
+    }
   )
 ]
 

@@ -298,11 +298,7 @@ function checkLastModifiedTime (path) {
 }
 
 // Check last modified times of all files
-Object.values(sources).map((source) => source.path).forEach((filePath) => {
-  checkLastModifiedTime(filePath)
-})
+Object.values(sources).map((source) => source.path).forEach(checkLastModifiedTime)
 
-trackedFiles.generatedFiles.forEach((filePath) => {
-  checkLastModifiedTime(filePath)
-})
+trackedFiles.generatedFiles.forEach(checkLastModifiedTime)
 

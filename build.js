@@ -20,8 +20,10 @@ class SourceFile {
   //  @returns {string}         the contents of the file
   //  @throws  {ReferenceError} when the contents have not been loaded
   getContents () {
-    if (!(this.contents)) {
+    if (this.contents === undefined) {
       throw new ReferenceError('File contents not loaded')
+    } else if (this.contents.trim() === '') {
+      console.warn(`WARNING: ${this.path} is empty or contains only whitespace.`)
     }
 
     return this.contents
@@ -137,7 +139,6 @@ class DependencyTree {
 }
 
 let checkedFileCount = 0
-const TRACKED_FILE_COUNT = 12
 const trackedFiles = {
   sources: {
     'about.mustache':         new SourceFile('./templates/about.mustache'),
@@ -146,8 +147,11 @@ const trackedFiles = {
     'index.mustache':         new SourceFile('./templates/index.mustache'),
     'aboutModal.mustache':    new SourceFile('./templates/aboutModal.mustache'),
     'nav.mustache':           new SourceFile('./templates/nav.mustache'),
+    'nav.scss':               new SourceFile('./css/sass/_nav.scss'),
     'sharedStyles.mustache':  new SourceFile('./templates/sharedStyles.mustache'),
-    'sharedScripts.mustache': new SourceFile('./templates/sharedScripts.mustache')
+    'sharedScripts.mustache': new SourceFile('./templates/sharedScripts.mustache'),
+    'theme.scss':             new SourceFile('./css/sass/_theme.scss'),
+    'themeForms.scss':        new SourceFile('./css/sass/_themeForms.scss')
   },
   generatedFiles: [
     './about.html',
@@ -159,6 +163,7 @@ const trackedFiles = {
 
 const fileLastModifiedTimes = {}
 const sources = trackedFiles.sources
+const TRACKED_FILE_COUNT = Object.keys(sources).length + trackedFiles.generatedFiles.length
 /*
  * Functions to generate files
  */
@@ -182,8 +187,18 @@ function buildHTML (generatedFilePath, primarySource, secondarySources, buildOpt
 }
 
 // Generates css/configMaker.css
-function buildConfigMakerCSS (generatedFilePath, primarySource, secondarySources) {
-  fs.promises.writeFile(generatedFilePath, Sass.renderSync({data: primarySource.getContents()}).css
+function buildConfigMakerCSS (generatedFilePath, primarySource) {
+  fs.promises.writeFile(generatedFilePath, Sass.renderSync({
+    data: primarySource.getContents(),
+    importer: [
+      function(url) {
+        return {
+          contents: sources[`${url}.scss`].getContents()
+        }
+      }
+    ],
+    sourceComments: true
+  }).css
   ).then(() => {
     console.log('generated css/configMaker.css')
   }).catch((err) => {
@@ -223,7 +238,11 @@ const buildTrees = [
   new DependencyTree(
     './css/configMaker.css',
     sources['configMaker.scss'],
-    [],
+    [
+      sources['nav.scss'],
+      sources['theme.scss'],
+      sources['themeForms.scss']
+    ],
     buildConfigMakerCSS
   ),
   new DependencyTree(
@@ -286,9 +305,7 @@ function checkLastModifiedTime (path) {
       fileLastModifiedTimes[path] = stats.mtimeMs
       checkedFileCount++
 
-      if (checkedFileCount > TRACKED_FILE_COUNT) {
-        throw new RangeError(`\n\nERROR: More files were asynchronously checked for last modified time than TRACKED_FILE_COUNT(${TRACKED_FILE_COUNT}).\n       The callback for all files checked may not work properly. Was a new file added?\n`)
-      } else if (checkedFileCount === TRACKED_FILE_COUNT) {
+      if (checkedFileCount === TRACKED_FILE_COUNT) {
         onLastModifiedTimesCollected()
       }
     }).catch((err) => {

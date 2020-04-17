@@ -1,5 +1,38 @@
+@font-face {
+  font-family: "Material Icons";
+  font-style: normal;
+  font-weight: 400;
+  src: url(../assets/font/materialIcons.woff2) format("woff2");
+}
+body, html {
+  height: 100%;
+}
+
 body {
-  overflow-y: hidden;
+  background-image: url(../assets/img/WeatherBotBackground.jpg);
+  background-position: bottom;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.clear.indigo.darken-4 {
+  background-color: #1a237e88 !important;
+}
+
+.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -moz-font-feature-settings: "liga";
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /*
@@ -15,17 +48,41 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
+.input-field input[type=text], .input-field input[type=number] {
+  box-sizing: border-box;
+  padding-left: 1em;
+}
+.input-field input[type=text]:focus + label {
+  color: white !important;
+}
+.input-field input[type=text]:focus, .input-field textarea:focus {
+  border-bottom: 1px solid white !important;
+  box-shadow: 0 1px 0 0 white !important;
+}
+.input-field textarea:focus + label {
+  color: white !important;
+}
+
+nav {
+  background-color: unset;
+}
+nav ul a:hover {
+  background-color: #1a237e;
+}
+nav .brand-logo {
+  padding: 0 0.5em;
+}
+
+body {
+  overflow-y: hidden;
+}
+
 .abbreviation-autocomplete input[type=text] {
   background-color: #283593;
   color: #fff;
 }
 .abbreviation-autocomplete ul {
   z-index: 1;
-}
-
-.input-field input[type=text], .input-field input[type=number] {
-  box-sizing: border-box;
-  padding-left: 1em;
 }
 
 .tabs .indicator {

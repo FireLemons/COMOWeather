@@ -2,8 +2,6 @@ const fs = require('fs')
 const Mustache = require('mustache')
 const Sass = require('sass')
 
-console.log('WARNING: Generated files will only be updated if the source files were last modified later than the generated files.')
-
 // Represents a source file used to generate a file
 class SourceFile {
   // @param   {string}    path The path to the source file
@@ -98,9 +96,15 @@ class DependencyTree {
       })
     }
 
+    let secondarySourcesAsObject = {}
+
+    secondarySources.forEach((source) => {
+      secondarySourcesAsObject[/.*?\/_?([a-zA-Z]+)\.[a-z]+/.exec(source.path)[1]] = source
+    })
+
     this.generatedFilePath = generatedFilePath
     this.primarySource = primarySource
-    this.secondarySources = secondarySources
+    this.secondarySources = secondarySourcesAsObject
     this.build = build
     this.buildOptions = buildOptions
   }
@@ -110,7 +114,7 @@ class DependencyTree {
     const primarySource = this.primarySource
     const secondarySources = this.secondarySources
 
-    if (primarySource.isLoaded() && secondarySources.reduce((acc, source) => acc && source.isLoaded(), true)) {
+    if (primarySource.isLoaded() && Object.values(secondarySources).reduce((acc, source) => acc && source.isLoaded(), true)) {
       this.build(this.generatedFilePath, primarySource, secondarySources, this.buildOptions)
     }
   }
@@ -168,17 +172,13 @@ const TRACKED_FILE_COUNT = Object.keys(sources).length + trackedFiles.generatedF
  * Functions to generate files
  */
 
-const fileNamePattern = /.*?\/([a-zA-Z_]+)\.[a-z]+/
-
 // Generates HTML files from Mustache templates
 function buildHTML (generatedFilePath, primarySource, secondarySources, buildOptions) {
-  let secondarySourcesAsObject = {}
+  for (let sourceKey in secondarySources) {
+    secondarySources[sourceKey] = secondarySources[sourceKey].getContents()
+  }
 
-  secondarySources.forEach((source) => {
-    secondarySourcesAsObject[fileNamePattern.exec(source.path)[1]] = source.getContents()
-  })
-
-  fs.promises.writeFile(generatedFilePath, Mustache.render(primarySource.getContents(), buildOptions, secondarySourcesAsObject)).then(() => {
+  fs.promises.writeFile(generatedFilePath, Mustache.render(primarySource.getContents(), buildOptions, secondarySources)).then(() => {
     console.log(`generated ${generatedFilePath}`)
   }).catch((err) => {
     console.log(`ERROR: Failed to generate ${generatedFilePath}`)
@@ -186,14 +186,14 @@ function buildHTML (generatedFilePath, primarySource, secondarySources, buildOpt
   })
 }
 
-// Generates css/configMaker.css
-function buildConfigMakerCSS (generatedFilePath, primarySource) {
+// Generates css files from scss files
+function buildCSS (generatedFilePath, primarySource, secondarySources) {
   fs.promises.writeFile(generatedFilePath, Sass.renderSync({
     data: primarySource.getContents(),
     importer: [
       function(url) {
         return {
-          contents: sources[`${url}.scss`].getContents()
+          contents: secondarySources[url].getContents()
         }
       }
     ],
@@ -243,7 +243,7 @@ const buildTrees = [
       sources['theme.scss'],
       sources['themeForms.scss']
     ],
-    buildConfigMakerCSS
+    buildCSS
   ),
   new DependencyTree(
     './index.html',
@@ -263,6 +263,8 @@ const buildTrees = [
 
 // Determines which files to generate based on last modified times of files
 function onLastModifiedTimesCollected () {
+  console.log('WARNING: Generated files will only be updated if the source files were last modified later than the generated files.')
+
   buildTrees.forEach((buildTree) => {
     if (buildTree.isOutdated()) {
       const primarySource = buildTree.primarySource
@@ -273,7 +275,7 @@ function onLastModifiedTimesCollected () {
         primarySource.loadCallbacks = [() => { buildTree.generateFile() }]
       }
 
-      buildTree.secondarySources.forEach((source) => {
+      Object.values(buildTree.secondarySources).forEach((source) => {
         if (source.loadCallbacks) {
           source.loadCallbacks.push(() => { buildTree.generateFile() })
         } else {

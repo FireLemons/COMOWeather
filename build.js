@@ -316,8 +316,38 @@ function checkLastModifiedTime (path) {
     })
 }
 
-// Check last modified times of all files
+// Lazily builds generated files from dependencies
+//  @param  {DependencyTree[]}  buildTrees A list of the files to be generated and their dependencies represented as trees
+//  @throws {TypeError}         when an argument is of the wrong type
+function build(buildTrees){
+  if (!(buildTrees instanceof Array)) {
+    throw new TypeError('Param buildTrees must be an array')
+  }
+
+  buildTrees.forEach((buildTree, index) => {
+    if (!(buildTree instanceof DependencyTree)) {
+      throw new TypeError(`Param buildTrees must contain only DependencyTree objects. Encountered incompatible object at index: ${index}`)
+    }
+  })
+
+  // Remove duplicate sources
+  const sources = []
+  const generatedFilePaths = []
+
+  buildTrees.forEach((buildTree) => {
+    let primarySource = buildTree.primarySource
+    let secondarySources = buildTree.secondarySources
+
+    sources[primarySource.path] = primarySource
+
+    Object.values(secondarySources).forEach((source) => {
+      sources[source.path] = source
+    })
+
+    generatedFilePaths.push(buildTree.generatedFilePath)
+  })
+}
+
 Object.values(sources).map((source) => source.path).forEach(checkLastModifiedTime)
 
 trackedFiles.generatedFiles.forEach(checkLastModifiedTime)
-

@@ -6,7 +6,7 @@ const Sass = require('sass')
 class SourceFile {
   // @param   {string}    path The path to the source file
   // @throws  {TypeError} when an argument is of the wrong type
-  constructor (path, type) {
+  constructor (path) {
     if (typeof path !== 'string') {
       throw new TypeError('Param path must be a string')
     }
@@ -64,7 +64,7 @@ class SourceFile {
 // Represents a generated file and the source files used to generate it
 class DependencyTree {
   // @param  {string}        generatedFilePath The path to the file generated
-  // @param {SourceFile}    primarySource The source that references all other sources
+  // @param  {SourceFile}    primarySource The source that references all other sources
   // @param  {SourceFile[]}  secondarySources The source files referenced by the primary source
   // @param  {function}      build(generatedFilePath, sourceFiles) The function to generate the file
   //   @param {string}         generatedFilePath the path to the file to be generated
@@ -114,7 +114,12 @@ class DependencyTree {
     const primarySource = this.primarySource
     const secondarySources = this.secondarySources
 
-    if (primarySource.isLoaded() && Object.values(secondarySources).reduce((acc, source) => acc && source.isLoaded(), true)) {
+    const sources = Object.values(secondarySources).concat(primarySource)
+    const unreadySource = sources.find((source) => {
+      return !source.isLoaded()
+    })
+
+    if (unreadySource === undefined) {
       this.build(this.generatedFilePath, primarySource, secondarySources, this.buildOptions)
     }
   }

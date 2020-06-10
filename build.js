@@ -301,13 +301,14 @@ function onLastModifiedTimesCollected () {
 
 // Asynchronously fetches the last modified time for a file and stores it in fileLastModifiedTimes
 //   @param  {string}       path The path to the source file to be loaded
+//   @return {Promise}      the stat operation of the file
 //   @throws {TypeError}    When path is not a string
 function checkLastModifiedTime (path) {
   if (typeof path !== 'string') {
     throw new TypeError('Param path must be a string')
   }
 
-  fs.promises.stat(path)
+  return fs.promises.stat(path)
     .then((stats) => {
       fileLastModifiedTimes[path] = stats.mtimeMs
       checkedFileCount++

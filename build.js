@@ -76,19 +76,19 @@ class GeneratedFile {
 
 // Represents a generated file and the source files used to generate it
 class DependencyTree {
-  // @param  {string}        generatedFilePath The path to the file generated
-  // @param  {SourceFile}    primarySource The source that references all other sources
-  // @param  {SourceFile[]}  secondarySources The source files referenced by the primary source
-  // @param  {function}      build(generatedFilePath, sourceFiles) The function to generate the file
-  //   @param {string}         generatedFilePath the path to the file to be generated
-  //   @param {SourceFile}     primarySource The source that references all other sources
-  //   @param {object}         sourceFiles The source files referenced by the primary source in an object where the key for the source is the name of the source file excluding its extension
-  //   @param {object}         buildOptions Additional arguments for generating the file
-  // @param  {object}        buildOptions Additional arguments to be passed to the build function
-  // @throws {TypeError}     when an argument is of the wrong type
-  constructor (generatedFilePath, primarySource, secondarySources, build, buildOptions) {
-    if (typeof generatedFilePath !== 'string') {
-      throw new TypeError('Param generatedFilePath must be a string')
+  // @param  {string|GeneratedFile} generatedFile The path to the file generated
+  // @param  {SourceFile}           primarySource The source that references all other sources
+  // @param  {SourceFile[]}         secondarySources The source files referenced by the primary source
+  // @param  {function}             build(generatedFilePath, sourceFiles) The function to generate the file
+  //   @param {string}                generatedFilePath the path to the file to be generated
+  //   @param {SourceFile}            primarySource The source that references all other sources
+  //   @param {object}                sourceFiles The source files referenced by the primary source in an object where the key for the source is the name of the source file excluding its extension
+  //   @param {object}                buildOptions Additional arguments for generating the file
+  // @param  {object}               buildOptions Additional arguments to be passed to the build function
+  // @throws {TypeError}            when an argument is of the wrong type
+  constructor (generatedFile, primarySource, secondarySources, build, buildOptions) {
+    if ((typeof generatedFile !== 'string') && !(generatedFile instanceof GeneratedFile)) {
+      throw new TypeError('Param generatedFile must be a string or GeneratedFile')
     }
 
     if (!(build instanceof Function)) {
@@ -115,7 +115,7 @@ class DependencyTree {
       secondarySourcesAsObject[/.*?\/_?([a-zA-Z]+)\.[a-z]+/.exec(source.path)[1]] = source
     })
 
-    this.generatedFilePath = generatedFilePath
+    this.generatedFile = (generatedFile instanceof GeneratedFile) ? generatedFile : new GeneratedFile(generatedFile)
     this.primarySource = primarySource
     this.secondarySources = secondarySourcesAsObject
     this.build = build
@@ -133,17 +133,17 @@ class DependencyTree {
     })
 
     if (unreadySource === undefined) {
-      this.build(this.generatedFilePath, primarySource, secondarySources, this.buildOptions)
+      this.build(this.generatedFile.path, primarySource, secondarySources, this.buildOptions)
     }
   }
 
   // Determines whether the generated file is up to date with its source files
   //  @returns true if the generated file does not exist or is older than a source file. false otherwise
   isOutdated () {
-    if (!fs.existsSync(this.generatedFilePath)) {
+    if (!fs.existsSync(this.generatedFile.path)) {
       return true
     } else {
-      const generatedFileLastModifiedTime = fileLastModifiedTimes[this.generatedFilePath]
+      const generatedFileLastModifiedTime = fileLastModifiedTimes[this.generatedFile.path]
 
       if (generatedFileLastModifiedTime < fileLastModifiedTimes[this.primarySource.path]) {
         return true
@@ -335,6 +335,14 @@ function checkLastModifiedTime (path) {
     })
 }
 
+// Collects the last modified times of all sources
+//
+//
+//
+function statFiles () {
+
+}
+
 // Lazily builds generated files from dependencies
 //  @param  {DependencyTree[]}  buildTrees A list of the files to be generated and their dependencies represented as trees
 //  @throws {TypeError}         when an argument is of the wrong type
@@ -363,7 +371,7 @@ function build(buildTrees){
       sources[source.path] = source
     })
 
-    generatedFilePaths.push(buildTree.generatedFilePath)
+    generatedFilePaths.push(buildTree.generatedFile.path)
   })
 }
 

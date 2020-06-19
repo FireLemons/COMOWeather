@@ -61,6 +61,19 @@ class SourceFile {
   }
 }
 
+// Represents a generated file
+class GeneratedFile {
+  // @param   {string}    path The path to the source file
+  // @throws  {TypeError} when an argument is of the wrong type
+  constructor (path) {
+    if (typeof path !== 'string') {
+      throw new TypeError('Param path must be a string')
+    }
+
+    this.path = path
+  }
+}
+
 // Represents a generated file and the source files used to generate it
 class DependencyTree {
   // @param  {string}        generatedFilePath The path to the file generated

@@ -335,12 +335,23 @@ function checkLastModifiedTime (path) {
     })
 }
 
-// Collects the last modified times of all sources
-//
-//
-//
-function statFiles () {
-
+// Attempts to collect the last modified times of all sources and generated files
+//  @param  {object[]}  An array of SourceFile and GeneratedFile objects
+//  @return {Promise}   A promise resolving after all stat operations have been completed
+//  @throws {TypeError} when files is not an array, when files contains an element that is not a SourceFile or GeneratedFile, when a SourceFile or GeneratedFile's path is not a string
+function statFiles (files) {
+  if(!(files instanceof Array)){
+    throw new TypeError('Param files must be an array')
+  } else {
+    files.forEach((file, index) => {
+      if(!(file instanceof SourceFile || file instanceof GeneratedFile)){
+        console.error(`ERROR: Encountered invalid object at files[${index}]`)
+        throw new TypeError('Param files can only contain SourceFile or GeneratedFile objects')
+      } else if (typeof file.path !== 'string') {
+        throw new TypeError(`files[${index}] contains a SourceFile or GeneratedFile with an invalid path`)
+      }
+    })
+  }
 }
 
 // Lazily builds generated files from dependencies
@@ -357,24 +368,28 @@ function build(buildTrees){
     }
   })
 
-  // Remove duplicate sources
-  const sources = []
-  const generatedFilePaths = []
+  // Create a list of relevant files without duplicates
+  const files = []
 
   buildTrees.forEach((buildTree) => {
     let primarySource = buildTree.primarySource
     let secondarySources = buildTree.secondarySources
+    let generatedFile = buildTree.generatedFile
 
-    sources[primarySource.path] = primarySource
+    files[primarySource.path] = primarySource
 
     Object.values(secondarySources).forEach((source) => {
-      sources[source.path] = source
+      files[source.path] = source
     })
 
-    generatedFilePaths.push(buildTree.generatedFile.path)
+    files[generatedFile.path] = generatedFile
   })
+
+  statFiles(files)
 }
 
 Object.values(sources).map((source) => source.path).forEach(checkLastModifiedTime)
 
 trackedFiles.generatedFiles.forEach(checkLastModifiedTime)
+
+build(buildTrees)

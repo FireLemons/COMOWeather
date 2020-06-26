@@ -140,19 +140,32 @@ class DependencyTree {
   // Determines whether the generated file is up to date with its source files
   //  @returns true if the generated file does not exist or is older than a source file. false otherwise
   isOutdated () {
-    if (!fs.existsSync(this.generatedFile.path)) {
-      return true
-    } else {
-      const generatedFileLastModifiedTime = fileLastModifiedTimes[this.generatedFile.path]
-
-      if (generatedFileLastModifiedTime < fileLastModifiedTimes[this.primarySource.path]) {
+    const sources = Object.values(this.secondarySources).concat(this.primarySource)
+ 
+    // Check if all sources were stat
+    let unstatSource = sources.find((source) => {
+      if (!source.lastModifiedTime) {
+        console.error(`ERROR: Could not determine if ${this.generatedFile.path} is updated. Required source ${source.path} was not stat`)
         return true
       }
+    })
 
-      for (const source in this.secondarySources) {
-        if (generatedFileLastModifiedTime < fileLastModifiedTimes[this.secondarySources[source].path]) {
+    if (unstatSource) {
+      return false
+    }
+
+    if (!this.generatedFile.lastModifiedTime) {
+      return true
+    } else {
+      const generatedFileLastModifiedTime = this.generatedFile.lastModifiedTime
+      const updatedSource = sources.find((source) => {
+        if (generatedFileLastModifiedTime < source.lastModifiedTime) {
           return true
         }
+      })
+
+      if (updatedSource) {
+        return true
       }
 
       return false
@@ -312,29 +325,6 @@ function onLastModifiedTimesCollected () {
   console.log('Finished generating files')
 }
 
-// Asynchronously fetches the last modified time for a file and stores it in fileLastModifiedTimes
-//   @param  {string}       path The path to the source file to be loaded
-//   @return {Promise}      the stat operation of the file
-//   @throws {TypeError}    When path is not a string
-function checkLastModifiedTime (path) {
-  if (typeof path !== 'string') {
-    throw new TypeError('Param path must be a string')
-  }
-
-  return fs.promises.stat(path)
-    .then((stats) => {
-      fileLastModifiedTimes[path] = stats.mtimeMs
-      checkedFileCount++
-
-      if (checkedFileCount === TRACKED_FILE_COUNT) {
-        onLastModifiedTimesCollected()
-      }
-    }).catch((err) => {
-      checkedFileCount++
-      console.warn(err)
-    })
-}
-
 // Attempts to collect the last modified times of all sources and generated files
 //  @param  {object[]}  An array of SourceFile and GeneratedFile objects
 //  @return {Promise}   A promise resolving after all stat operations have been completed
@@ -352,6 +342,29 @@ function statFiles (files) {
       }
     })
   }
+
+  const TRACKED_FILE_COUNT = files.length
+  let checkedFileCount = 0
+
+  files.forEach((file) => {
+    fs.promises.stat(file.path).then((stats) => {
+      file.lastModifiedTime = stats.mtimeMs
+    }).catch((err) => {
+      if (file instanceof GeneratedFile) {
+        console.warn(`WARNING: Failed to stat ${file.path}. File is assumed to have not been generated yet`)
+        console.warn(err)
+      } else if (file instanceof SourceFile) {
+        console.error(`ERROR: Failed to stat ${file.path}. Files requiring ${file.path} will not be generated.`)
+        console.error(err)
+      }
+    }).finally(() => {
+      checkedFileCount++
+
+      if (checkedFileCount === TRACKED_FILE_COUNT) {
+        onLastModifiedTimesCollected()
+      }
+    })
+  })
 }
 
 // Lazily builds generated files from dependencies
@@ -369,7 +382,7 @@ function build(buildTrees){
   })
 
   // Create a list of relevant files without duplicates
-  const files = []
+  const files = {}
 
   buildTrees.forEach((buildTree) => {
     let primarySource = buildTree.primarySource
@@ -385,11 +398,7 @@ function build(buildTrees){
     files[generatedFile.path] = generatedFile
   })
 
-  statFiles(files)
+  statFiles(Object.values(files))
 }
-
-Object.values(sources).map((source) => source.path).forEach(checkLastModifiedTime)
-
-trackedFiles.generatedFiles.forEach(checkLastModifiedTime)
 
 build(buildTrees)

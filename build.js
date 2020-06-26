@@ -173,32 +173,6 @@ class DependencyTree {
   }
 }
 
-let checkedFileCount = 0
-const trackedFiles = {
-  sources: {
-    'about.mustache':         new SourceFile('./templates/about.mustache'),
-    'configMaker.mustache':   new SourceFile('./templates/configMaker.mustache'),
-    'configMaker.scss':       new SourceFile('./css/sass/configMaker.scss'),
-    'index.mustache':         new SourceFile('./templates/index.mustache'),
-    'aboutModal.mustache':    new SourceFile('./templates/aboutModal.mustache'),
-    'nav.mustache':           new SourceFile('./templates/nav.mustache'),
-    'nav.scss':               new SourceFile('./css/sass/_nav.scss'),
-    'sharedStyles.mustache':  new SourceFile('./templates/sharedStyles.mustache'),
-    'sharedScripts.mustache': new SourceFile('./templates/sharedScripts.mustache'),
-    'theme.scss':             new SourceFile('./css/sass/_theme.scss'),
-    'themeForms.scss':        new SourceFile('./css/sass/_themeForms.scss')
-  },
-  generatedFiles: [
-    './about.html',
-    './configMaker/index.html',
-    './index.html',
-    './css/configMaker.css'
-  ]
-}
-
-const fileLastModifiedTimes = {}
-const sources = trackedFiles.sources
-const TRACKED_FILE_COUNT = Object.keys(sources).length + trackedFiles.generatedFiles.length
 /*
  * Functions to generate files
  */
@@ -237,6 +211,30 @@ function buildCSS (generatedFilePath, primarySource, secondarySources) {
     console.error(err)
   })
 }
+
+const trackedFiles = {
+  sources: {
+    'about.mustache':         new SourceFile('./templates/about.mustache'),
+    'configMaker.mustache':   new SourceFile('./templates/configMaker.mustache'),
+    'configMaker.scss':       new SourceFile('./css/sass/configMaker.scss'),
+    'index.mustache':         new SourceFile('./templates/index.mustache'),
+    'aboutModal.mustache':    new SourceFile('./templates/aboutModal.mustache'),
+    'nav.mustache':           new SourceFile('./templates/nav.mustache'),
+    'nav.scss':               new SourceFile('./css/sass/_nav.scss'),
+    'sharedStyles.mustache':  new SourceFile('./templates/sharedStyles.mustache'),
+    'sharedScripts.mustache': new SourceFile('./templates/sharedScripts.mustache'),
+    'theme.scss':             new SourceFile('./css/sass/_theme.scss'),
+    'themeForms.scss':        new SourceFile('./css/sass/_themeForms.scss')
+  },
+  generatedFiles: [
+    './about.html',
+    './configMaker/index.html',
+    './index.html',
+    './css/configMaker.css'
+  ]
+}
+
+const sources = trackedFiles.sources
 
 const buildTrees = [
   new DependencyTree(

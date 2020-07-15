@@ -15,7 +15,7 @@ class SourceFile {
   }
 
   // Get the contents of the file
-  //  @returns {string}         the contents of the file
+  //  @return  {string}         the contents of the file
   //  @throws  {ReferenceError} when the contents have not been loaded
   getContents () {
     if (this.contents === undefined) {
@@ -109,17 +109,18 @@ class DependencyTree {
       })
     }
 
+    // convert secondarySources to object
     let secondarySourcesAsObject = {}
 
     secondarySources.forEach((source) => {
       secondarySourcesAsObject[/.*?\/_?([a-zA-Z]+)\.[a-z]+/.exec(source.path)[1]] = source
     })
 
+    this.build = build
+    this.buildOptions = buildOptions
     this.generatedFile = (generatedFile instanceof GeneratedFile) ? generatedFile : new GeneratedFile(generatedFile)
     this.primarySource = primarySource
     this.secondarySources = secondarySourcesAsObject
-    this.build = build
-    this.buildOptions = buildOptions
   }
 
   // Generates the file if all the sources are loaded
@@ -138,7 +139,7 @@ class DependencyTree {
   }
 
   // Determines whether the generated file is up to date with its source files
-  //  @returns true if the generated file does not exist or is older than a source file. false otherwise
+  //  @return {boolean} true if the generated file does not exist or is older than a source file. false otherwise
   isOutdated () {
     const sources = Object.values(this.secondarySources).concat(this.primarySource)
  
@@ -313,9 +314,8 @@ function onLastModifiedTimesCollected () {
   console.log('Finished generating files')
 }
 
-// Attempts to collect the last modified times of all sources and generated files
+// Attempts to collect the last modified times of all sources and generated files and builds afterwards
 //  @param  {object[]}  An array of SourceFile and GeneratedFile objects
-//  @return {Promise}   A promise resolving after all stat operations have been completed
 //  @throws {TypeError} when files is not an array, when files contains an element that is not a SourceFile or GeneratedFile, when a SourceFile or GeneratedFile's path is not a string
 function statFiles (files) {
   if(!(files instanceof Array)){
@@ -368,6 +368,8 @@ function build(buildTrees){
       throw new TypeError(`Param buildTrees must contain only DependencyTree objects. Encountered incompatible object at index: ${index}`)
     }
   })
+
+  console.log('INFO: Generated files will only be updated if the source files were last modified later than the generated files.')
 
   // Create a list of relevant files without duplicates
   const files = {}

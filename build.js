@@ -128,7 +128,7 @@ class DependencyTree {
     const primarySource = this.primarySource
     const secondarySources = this.secondarySources
 
-    const sources = Object.values(secondarySources).concat(primarySource)
+    const sources = this.getSources()
     const unreadySource = sources.find((source) => {
       return !source.isLoaded()
     })
@@ -138,10 +138,22 @@ class DependencyTree {
     }
   }
 
+  // Get a list of all files associated with this tree
+  //  @return {Object[]} an unsorted array containing this tree's GeneratedFile and all SourceFiles
+  getFiles () {
+    return Object.values(this.secondarySources).concat(this.primarySource, this.generatedFile)
+  }
+
+  // Get a list of all sources associated with this tree
+  //  @return {SourceFile[]} an unsorted array containing this tree's SourceFiles
+  getSources () {
+    return Object.values(this.secondarySources).concat(this.primarySource)
+  }
+
   // Determines whether the generated file is up to date with its source files
   //  @return {boolean} true if the generated file does not exist or is older than a source file. false otherwise
   isOutdated () {
-    const sources = Object.values(this.secondarySources).concat(this.primarySource)
+    const sources = this.getSources()
  
     // Check if all sources were stat
     let unstatSource = sources.find((source) => {
@@ -287,15 +299,7 @@ function onLastModifiedTimesCollected () {
 
   buildTrees.forEach((buildTree) => {
     if (buildTree.isOutdated()) {
-      const primarySource = buildTree.primarySource
-
-      if (primarySource.loadCallbacks) {
-        primarySource.loadCallbacks.push(() => { buildTree.generateFile() })
-      } else {
-        primarySource.loadCallbacks = [() => { buildTree.generateFile() }]
-      }
-
-      Object.values(buildTree.secondarySources).forEach((source) => {
+      buildTree.getSources().forEach((source) => {
         if (source.loadCallbacks) {
           source.loadCallbacks.push(() => { buildTree.generateFile() })
         } else {
@@ -375,17 +379,9 @@ function build(buildTrees){
   const files = {}
 
   buildTrees.forEach((buildTree) => {
-    let primarySource = buildTree.primarySource
-    let secondarySources = buildTree.secondarySources
-    let generatedFile = buildTree.generatedFile
-
-    files[primarySource.path] = primarySource
-
-    Object.values(secondarySources).forEach((source) => {
-      files[source.path] = source
+    buildTree.getFiles().forEach((file) => {
+      files[file.path] = file
     })
-
-    files[generatedFile.path] = generatedFile
   })
 
   statFiles(Object.values(files))

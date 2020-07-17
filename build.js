@@ -11,6 +11,9 @@ class SourceFile {
       throw new TypeError('Param path must be a string')
     }
 
+    // DependencyTrees this SourceFile is a member of
+    this.containingTrees = []
+
     this.path = path
   }
 
@@ -70,6 +73,9 @@ class GeneratedFile {
       throw new TypeError('Param path must be a string')
     }
 
+    // DependencyTrees this GeneratedFile is a member of
+    this.containingTrees = []
+
     this.path = path
   }
 }
@@ -121,6 +127,10 @@ class DependencyTree {
     this.generatedFile = (generatedFile instanceof GeneratedFile) ? generatedFile : new GeneratedFile(generatedFile)
     this.primarySource = primarySource
     this.secondarySources = secondarySourcesAsObject
+
+    this.getFiles().forEach((file) => {
+      file.containingTrees.push(this)
+    })
   }
 
   // Generates the file if all the sources are loaded

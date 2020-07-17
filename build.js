@@ -314,8 +314,6 @@ function onLastModifiedTimesCollected () {
       source.load(source.loadCallbacks)
     }
   })
-  
-  console.log('Finished generating files')
 }
 
 // Attempts to collect the last modified times of all sources and generated files and builds afterwards

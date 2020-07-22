@@ -15,6 +15,8 @@ class SourceFile {
     this.containingTrees = []
 
     this.path = path
+
+    this.promiseLoad = null
   }
 
   // Get the contents of the file
@@ -37,30 +39,19 @@ class SourceFile {
   }
 
   // Loads the contents of the file
-  //   @param {function[]} callbackList A list of functions to call after the source file has been loaded
+  //   @return {Promise} a promise awaiting loading the contents of the file
   //   @throws {SystemError}  When the file could not be read
-  //   @throws {TypeError}    When a parameter is of the incorrect type
-  load (callbackList) {
-    if (!(callbackList instanceof Array)) {
-      throw new TypeError('Param callbackList is not an array')
-    } else {
-      callbackList.forEach((callback) => {
-        if (!(callback instanceof Function)) {
-          throw new TypeError('Param callbackList can only contain function objects')
-        }
-      })
-    }
-
-    fs.promises.readFile(this.path, 'utf8')
+  load () {
+    if (this.promiseLoad === null) {
+      this.promiseLoad = fs.promises.readFile(this.path, 'utf8')
       .then((contents) => {
         this.contents = contents
-
-        callbackList.forEach((elem) => {
-          elem()
-        })
       }).catch((err) => {
         throw err
       })
+    }
+
+    return this.promiseLoad
   }
 }
 
@@ -127,7 +118,10 @@ class DependencyTree {
     this.generatedFile = (generatedFile instanceof GeneratedFile) ? generatedFile : new GeneratedFile(generatedFile)
     this.primarySource = primarySource
     this.secondarySources = secondarySourcesAsObject
+    this.statFileCount = 0
+    this.TRACKED_FILE_COUNT = secondarySources.length + 2
 
+    // Add reference to this parent tree for member files
     this.getFiles().forEach((file) => {
       file.containingTrees.push(this)
     })
@@ -135,17 +129,32 @@ class DependencyTree {
 
   // Generates the file if all the sources are loaded
   generateFile () {
-    const primarySource = this.primarySource
-    const secondarySources = this.secondarySources
+    let sourceFileLoading = new Promise((resolve, reject) => {
+      const sources = this.getSources()
+      let sourceLoadCount = 0
 
-    const sources = this.getSources()
-    const unreadySource = sources.find((source) => {
-      return !source.isLoaded()
+      sources.forEach((source) => {
+        source.load()
+        .then(() => {
+          sourceLoadCount++
+
+          if (sourceLoadCount === sources.length) {
+            resolve()
+          }
+        })
+        .catch((err) => {
+          console.error(`Failed to load source ${source.path}`)
+          reject(err)
+        })
+      })
+    }).catch((err) => {
+      console.error(`Failed to load sources for ${this.generatedFile.path}`)
+      console.error(err)
     })
 
-    if (unreadySource === undefined) {
-      this.build(this.generatedFile.path, primarySource, secondarySources, this.buildOptions)
-    }
+    sourceFileLoading.then(() => {
+      this.build(this.generatedFile.path, this.primarySource, this.secondarySources, this.buildOptions)
+    })
   }
 
   // Get a list of all files associated with this tree
@@ -192,6 +201,20 @@ class DependencyTree {
       }
 
       return false
+    }
+  }
+
+  // Checks if all files have had a chance to be stat
+  //  if so attempts to lazily build generatedFile
+  onFileStat () {
+    this.statFileCount++
+
+    let isOutdated
+
+    if (this.statFileCount === this.TRACKED_FILE_COUNT && (isOutdated = this.isOutdated())) {
+      this.generateFile()
+    } else if (isOutdated === false) {
+      console.log(`INFO: ${this.generatedFile.path} is up to date. Skipping build.`)
     }
   }
 }
@@ -303,29 +326,6 @@ const buildTrees = [
   )
 ]
 
-// Determines which files to generate based on last modified times of files
-function onLastModifiedTimesCollected () {
-  console.log('WARNING: Generated files will only be updated if the source files were last modified later than the generated files.')
-
-  buildTrees.forEach((buildTree) => {
-    if (buildTree.isOutdated()) {
-      buildTree.getSources().forEach((source) => {
-        if (source.loadCallbacks) {
-          source.loadCallbacks.push(() => { buildTree.generateFile() })
-        } else {
-          source.loadCallbacks = [() => { buildTree.generateFile() }]
-        }
-      })
-    }
-  })
-
-  Object.values(sources).forEach((source) => {
-    if (source.loadCallbacks) {
-      source.load(source.loadCallbacks)
-    }
-  })
-}
-
 // Attempts to collect the last modified times of all sources and generated files and builds afterwards
 //  @param  {object[]}  An array of SourceFile and GeneratedFile objects
 //  @throws {TypeError} when files is not an array, when files contains an element that is not a SourceFile or GeneratedFile, when a SourceFile or GeneratedFile's path is not a string
@@ -343,9 +343,6 @@ function statFiles (files) {
     })
   }
 
-  const TRACKED_FILE_COUNT = files.length
-  let checkedFileCount = 0
-
   files.forEach((file) => {
     fs.promises.stat(file.path).then((stats) => {
       file.lastModifiedTime = stats.mtimeMs
@@ -358,11 +355,9 @@ function statFiles (files) {
         console.error(err)
       }
     }).finally(() => {
-      checkedFileCount++
-
-      if (checkedFileCount === TRACKED_FILE_COUNT) {
-        onLastModifiedTimesCollected()
-      }
+      file.containingTrees.forEach((tree) => {
+        tree.onFileStat()
+      })
     })
   })
 }

@@ -17,6 +17,7 @@ class SourceFile {
     this.path = path
 
     this.promiseLoad = null
+    this.promiseStat = null
   }
 
   // Get the contents of the file
@@ -39,8 +40,8 @@ class SourceFile {
   }
 
   // Loads the contents of the file
-  //   @return {Promise} a promise awaiting loading the contents of the file
-  //   @throws {SystemError}  When the file could not be read
+  //   @return {Promise}     a promise awaiting loading the contents of the file
+  //   @throws {SystemError} When the file could not be read
   load () {
     if (this.promiseLoad === null) {
       this.promiseLoad = fs.promises.readFile(this.path, 'utf8')
@@ -52,6 +53,23 @@ class SourceFile {
     }
 
     return this.promiseLoad
+  }
+
+  // Stat a file
+  //   @return {Promise}     a promise awating the stat operation of the file
+  //   @throws {SystemError} When the file could not be stat
+  stat () {
+    if (this.promiseStat === null) {
+      this.promiseStat = fs.promises.stat(this.path)
+      .then((stats) => {
+        this.lastModifiedTime = stats.mtimeMs
+      }).catch((err) => {
+        console.error(`ERROR: Failed to stat ${file.path}. Files requiring ${file.path} will not be generated.`)
+        throw err
+      })
+    }
+
+    return this.promiseStat
   }
 }
 
@@ -344,21 +362,25 @@ function statFiles (files) {
   }
 
   files.forEach((file) => {
-    fs.promises.stat(file.path).then((stats) => {
-      file.lastModifiedTime = stats.mtimeMs
-    }).catch((err) => {
-      if (file instanceof GeneratedFile) {
+    if (file instanceof SourceFile) {
+      file.stat()
+      .finally(() => {
+        file.containingTrees.forEach((tree) => {
+          tree.onFileStat()
+        })
+      })
+    } else {
+      fs.promises.stat(file.path).then((stats) => {
+        file.lastModifiedTime = stats.mtimeMs
+      }).catch((err) => {
         console.warn(`WARNING: Failed to stat ${file.path}. File is assumed to have not been generated yet`)
         console.warn(err)
-      } else if (file instanceof SourceFile) {
-        console.error(`ERROR: Failed to stat ${file.path}. Files requiring ${file.path} will not be generated.`)
-        console.error(err)
-      }
-    }).finally(() => {
-      file.containingTrees.forEach((tree) => {
-        tree.onFileStat()
+      }).finally(() => {
+        file.containingTrees.forEach((tree) => {
+          tree.onFileStat()
+        })
       })
-    })
+    }
   })
 }
 

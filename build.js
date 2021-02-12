@@ -2,22 +2,51 @@ const fs = require('fs')
 const Mustache = require('mustache')
 const Sass = require('sass')
 
-// Represents a source file used to generate a file
-class SourceFile {
+// Represents a generic file
+class File {
   // @param   {string}    path The path to the source file
   // @throws  {TypeError} when an argument is of the wrong type
   constructor (path) {
+    this.path = path
+
     if (typeof path !== 'string') {
       throw new TypeError('Param path must be a string')
     }
 
+    this.promiseStat = null
+  }
+
+  // Stat this file
+  //   @return {Promise}     a promise awating the stat operation of the file
+  //   @throws {SystemError} When the file could not be stat
+  stat () {
+    const path = this.path
+
+    if (this.promiseStat === null) {
+      this.promiseStat = fs.promises.stat(path)
+      .then((stats) => {
+        this.lastModifiedTime = stats.mtimeMs
+      }).catch((err) => {
+        console.error(`ERROR: Failed to stat ${path}. Files requiring ${path} will not be generated.`)
+        throw err
+      })
+    }
+
+    return this.promiseStat
+  }
+}
+
+// Represents a source file used to generate a file
+class SourceFile extends File {
+  // @param   {string}    path The path to the source file
+  // @throws  {TypeError} when an argument is of the wrong type
+  constructor (path) {
+    super(path)
+
     // DependencyTrees this SourceFile is a member of
     this.containingTrees = []
 
-    this.path = path
-
     this.promiseLoad = null
-    this.promiseStat = null
   }
 
   // Get the contents of the file
@@ -39,7 +68,7 @@ class SourceFile {
     return this.contents !== undefined
   }
 
-  // Loads the contents of the file
+  // Loads the contents of this file
   //   @return {Promise}     a promise awaiting loading the contents of the file
   //   @throws {SystemError} When the file could not be read
   load () {
@@ -54,38 +83,17 @@ class SourceFile {
 
     return this.promiseLoad
   }
-
-  // Stat a file
-  //   @return {Promise}     a promise awating the stat operation of the file
-  //   @throws {SystemError} When the file could not be stat
-  stat () {
-    if (this.promiseStat === null) {
-      this.promiseStat = fs.promises.stat(this.path)
-      .then((stats) => {
-        this.lastModifiedTime = stats.mtimeMs
-      }).catch((err) => {
-        console.error(`ERROR: Failed to stat ${file.path}. Files requiring ${file.path} will not be generated.`)
-        throw err
-      })
-    }
-
-    return this.promiseStat
-  }
 }
 
 // Represents a generated file
-class GeneratedFile {
+class GeneratedFile extends File {
   // @param   {string}    path The path to the source file
   // @throws  {TypeError} when an argument is of the wrong type
   constructor (path) {
-    if (typeof path !== 'string') {
-      throw new TypeError('Param path must be a string')
-    }
+    super(path)
 
     // DependencyTrees this GeneratedFile is a member of
     this.containingTrees = []
-
-    this.path = path
   }
 }
 

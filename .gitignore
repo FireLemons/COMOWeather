@@ -103,6 +103,8 @@ dist
 # TernJS port file
 .tern-port
 
-#Krita files
+# Krita files
 assets/krita_files/
 
+# vim .swp files
+.*.swp

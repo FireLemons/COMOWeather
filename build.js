@@ -225,20 +225,6 @@ class DependencyTree {
     }
   }
 
-  // Checks if all files have had a chance to be stat
-  //  if so attempts to lazily build generatedFile
-  onFileStat () {
-    this.statFileCount++
-
-    let isOutdated
-
-    if (this.statFileCount === this.TRACKED_FILE_COUNT && (isOutdated = this.isOutdated())) {
-      this.generateFile()
-    } else if (isOutdated === false) {
-      console.log(`INFO: ${this.generatedFile.path} is up to date. Skipping build.`)
-    }
-  }
-
   // Retrieves last modiifed times for all files
   statFiles () {
     const files = this.getFiles()

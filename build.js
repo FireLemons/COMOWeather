@@ -153,28 +153,7 @@ class DependencyTree {
   // Generates the file if all the sources are loaded
   //  @return {Promise} A promise representing the file generation
   generateFile () {
-    return new Promise((resolve, reject) => {
-      const sources = this.getSources()
-      let sourceLoadCount = 0
-
-      sources.forEach((source) => {
-        source.load()
-        .then(() => {
-          sourceLoadCount++
-
-          if (sourceLoadCount === sources.length) {
-            resolve()
-          }
-        })
-        .catch((err) => {
-          console.error(`Failed to load source ${source.path}`)
-          reject(err)
-        })
-      })
-    }).catch((err) => {
-      console.error(`Failed to load sources for ${this.generatedFile.path}`)
-      console.error(err)
-    })
+    return this.loadFiles()
       .then(() => {
         this.build(this.generatedFile.path, this.primarySource, this.secondarySources, this.buildOptions)
       })
@@ -225,7 +204,30 @@ class DependencyTree {
     }
   }
 
+  loadFiles () {
+    return new Promise((resolve, reject) => {
+      const sources = this.getSources()
+      let sourceLoadCount = 0
+
+      sources.forEach((source) => {
+        source.load()
+        .then(() => {
+          sourceLoadCount++
+
+          if (sourceLoadCount === sources.length) {
+            resolve()
+          }
+        })
+        .catch((err) => {
+          console.error(`Failed to load source ${source.path}`)
+          reject(err)
+        })
+      })
+    })
+  }
+
   // Retrieves last modiifed times for all files
+  //  @return {Promise} A promise representing the file generation
   statFiles () {
     const files = this.getFiles()
 

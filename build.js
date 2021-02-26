@@ -80,6 +80,17 @@ class SourceFile extends File {
 
     return this.promiseLoad
   }
+
+  // Stat this file
+  //   @return {Promise}     a promise awating the stat operation of the file
+  //   @throws {SystemError} When the file could not be stat
+  stat () {
+    return super.stat()
+      .catch((err) => {
+        console.error(`ERROR: Failed to stat ${file.path}. Files requiring ${file.path} will not be generated.`)
+        throw err
+      })
+  }
 }
 
 // Represents a generated file
@@ -91,6 +102,17 @@ class GeneratedFile extends File {
 
     // DependencyTrees this GeneratedFile is a member of
     this.containingTrees = []
+  }
+
+  // Stat this file
+  //   @return {Promise}     a promise awating the stat operation of the file
+  //   @throws {SystemError} When the file could not be stat
+  stat () {
+    return super.stat()
+      .catch((err) => {
+        console.warn(`WARNING: Failed to stat ${file.path}. File is assumed to have not been generated yet`)
+        console.warn(err)
+      })
   }
 }
 
@@ -233,32 +255,14 @@ class DependencyTree {
 
     return new Promise((resolve, reject) => {
       files.forEach((file) => {
-        if (file instanceof SourceFile) {
-          file.stat()
-            .catch((err) => {
-              console.error(`ERROR: Failed to stat ${file.path}. Files requiring ${file.path} will not be generated.`)
-              reject(err)
-            })
-            .finally(() => {
-              this.statFileCount++
+        file.stat()
+        .finally(() => {
+          this.statFileCount++
 
-              if (this.statFileCount === files.length) {
-                resolve()
-              }
-            })
-        } else { // File is generated file
-          file.stat()
-          .catch((err) => {
-            console.warn(`WARNING: Failed to stat ${file.path}. File is assumed to have not been generated yet`)
-            console.warn(err)
-          }).finally(() => {
-            this.statFileCount++
-
-            if (this.statFileCount === files.length) {
-              resolve()
-            }
-          })
-        }
+          if (this.statFileCount === files.length) {
+            resolve()
+          }
+        })
       })
     })
   }

@@ -1,5 +1,6 @@
 const fs = require('fs')
 const Mustache = require('mustache')
+const Sass = require('sass')
 const { GeneratedFile, SourceFile, DependencyTree } = require('./builder.js')
 
 /*

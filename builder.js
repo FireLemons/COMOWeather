@@ -1,6 +1,4 @@
 const fs = require('fs')
-const Mustache = require('mustache')
-const Sass = require('sass')
 
 // Represents a generic file
 class File {

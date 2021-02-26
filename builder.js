@@ -48,7 +48,7 @@ class GeneratedFile extends File {
   stat () {
     return super.stat()
       .catch((err) => {
-        console.warn(`WARNING: Failed to stat ${file.path}. File is assumed to have not been generated yet`)
+        console.warn(`WARNING: Failed to stat ${this.path}. File is assumed to have not been generated yet`)
         console.warn(err)
       })
   }
@@ -108,7 +108,7 @@ class SourceFile extends File {
   stat () {
     return super.stat()
       .catch((err) => {
-        console.error(`ERROR: Failed to stat ${file.path}. Files requiring ${file.path} will not be generated.`)
+        console.error(`ERROR: Failed to stat ${this.path}. Files requiring ${this.path} will not be generated.`)
         throw err
       })
   }
@@ -231,17 +231,17 @@ class DependencyTree {
 
       sources.forEach((source) => {
         source.load()
-        .then(() => {
-          sourceLoadCount++
+          .then(() => {
+            sourceLoadCount++
 
-          if (sourceLoadCount === sources.length) {
-            resolve()
-          }
-        })
-        .catch((err) => {
-          console.error(`Failed to load source ${source.path}`)
-          reject(err)
-        })
+            if (sourceLoadCount === sources.length) {
+              resolve()
+            }
+          })
+          .catch((err) => {
+            console.error(`Failed to load source ${source.path}`)
+            reject(err)
+          })
       })
     })
   }
@@ -254,13 +254,13 @@ class DependencyTree {
     return new Promise((resolve, reject) => {
       files.forEach((file) => {
         file.stat()
-        .finally(() => {
-          this.statFileCount++
+          .finally(() => {
+            this.statFileCount++
 
-          if (this.statFileCount === files.length) {
-            resolve()
-          }
-        })
+            if (this.statFileCount === files.length) {
+              resolve()
+            }
+          })
       })
     })
   }

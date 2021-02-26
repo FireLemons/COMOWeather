@@ -44,6 +44,7 @@ function buildCSS (generatedFilePath, primarySource, secondarySources) {
 
 const sources = {
   'about.mustache':         new SourceFile('./templates/about.mustache'),
+  'aboutText.mustache':     new SourceFile('./templates/aboutText.mustache'),
   'configMaker.mustache':   new SourceFile('./templates/configMaker.mustache'),
   'configMaker.scss':       new SourceFile('./css/sass/configMaker.scss'),
   'index.mustache':         new SourceFile('./templates/index.mustache'),
@@ -61,6 +62,7 @@ const buildTrees = [
     './about.html',
     sources['about.mustache'],
     [
+      sources['aboutText.mustache'],
       sources['nav.mustache'],
       sources['sharedStyles.mustache']
     ],
@@ -74,6 +76,7 @@ const buildTrees = [
     sources['configMaker.mustache'],
     [
       sources['aboutModal.mustache'],
+      sources['aboutText.mustache'],
       sources['nav.mustache'],
       sources['sharedScripts.mustache'],
       sources['sharedStyles.mustache']
@@ -99,6 +102,7 @@ const buildTrees = [
     sources['index.mustache'],
     [
       sources['aboutModal.mustache'],
+      sources['aboutText.mustache'],
       sources['nav.mustache'],
       sources['sharedScripts.mustache'],
       sources['sharedStyles.mustache']

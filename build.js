@@ -46,15 +46,15 @@ const sources = {
   'about.mustache':         new SourceFile('./templates/about.mustache'),
   'aboutText.mustache':     new SourceFile('./templates/aboutText.mustache'),
   'configMaker.mustache':   new SourceFile('./templates/configMaker.mustache'),
-  'configMaker.scss':       new SourceFile('./css/sass/configMaker.scss'),
+  'configMaker.scss':       new SourceFile('./css/scss/configMaker.scss'),
   'index.mustache':         new SourceFile('./templates/index.mustache'),
   'aboutModal.mustache':    new SourceFile('./templates/aboutModal.mustache'),
   'nav.mustache':           new SourceFile('./templates/nav.mustache'),
-  'nav.scss':               new SourceFile('./css/sass/_nav.scss'),
+  'nav.scss':               new SourceFile('./css/scss/_nav.scss'),
   'sharedStyles.mustache':  new SourceFile('./templates/sharedStyles.mustache'),
   'sharedScripts.mustache': new SourceFile('./templates/sharedScripts.mustache'),
-  'theme.scss':             new SourceFile('./css/sass/_theme.scss'),
-  'themeForms.scss':        new SourceFile('./css/sass/_themeForms.scss')
+  'theme.scss':             new SourceFile('./css/scss/_theme.scss'),
+  'themeForms.scss':        new SourceFile('./css/scss/_themeForms.scss')
 }
 
 const buildTrees = [

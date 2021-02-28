@@ -48,7 +48,6 @@ cd configMaker
 git checkout standalone
 
 possibleFileChanges=false
-buildScriptChanged=false
 
 for file in "${changed_files[@]}"; do
   if ! matchesList=$(matches_list $file warning_files); then
@@ -69,17 +68,7 @@ for file in "${changed_files[@]}"; do
     echo "WARNING: $file has no update policy"
     possibleFileChanges=true
   fi
-
-  if [[ $file = "build.js" ]];then
-    buildScriptChanged=true
-  fi
 done
-
-if [[ $buildScriptChanged = false ]];then
-  echo "INFO: $(node templates/build.js)"
-else
-  echo "WARNING: Skipping building configMaker via templates/build.js because build.js has been modified"
-fi
 
 if [[ "$(git status)" == *"not staged for commit"* ]]; then
   possibleFileChanges=true

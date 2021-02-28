@@ -1,15 +1,16 @@
 #!/bin/bash
 
-cd configMaker
+if [[ git diff --name-only | grep -nw "^configMaker$" ]]; then
+  cd configMaker
 
-config_maker_branch="$(git rev-parse --abbrev-ref HEAD)"
+  config_maker_branch="$(git rev-parse --abbrev-ref HEAD)"
 
-if [[ $config_maker_branch != "master" ]];then
-  echo ""
-  echo "ERROR: submodule configMaker must be on the master branch"
-  echo "  configMaker was instead on branch: $config_maker_branch"
-  echo ""
-  echo "Aborting commit"
-  exit 1
+  if [[ $config_maker_branch != "master" ]];then
+    echo ""
+    echo "ERROR: submodule configMaker must be on the master branch"
+    echo "  configMaker was instead on branch: $config_maker_branch"
+    echo ""
+    echo "Aborting commit"
+    exit 1
+  fi
 fi
-

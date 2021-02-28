@@ -35,9 +35,9 @@ function buildCSS (generatedFilePath, primarySource, secondarySources) {
     sourceComments: true
   }).css
   ).then(() => {
-    console.log('generated css/configMaker.css')
+    console.log(`generated ${generatedFilePath}`)
   }).catch((err) => {
-    console.log('ERROR: Failed to generate css/configMaker.css')
+    console.log(`ERROR: Failed to generate ${generatedFilePath}`)
     console.error(err)
   })
 }

@@ -40,6 +40,12 @@ body {
   overflow-y: scroll;
 }
 
+@font-face {
+  font-family: "Ubuntu Mono";
+  font-style: normal;
+  font-weight: 400;
+  src: url(../assets/font/ubuntu_mono/UbuntuMono-Regular.ttf) format("ttf");
+}
 /*
  * Hide number spinners for firefox
  */
@@ -66,6 +72,9 @@ input[type=number] {
 }
 .input-field textarea:focus + label {
   color: white !important;
+}
+.input-field textarea.code {
+  font-family: "Ubuntu Mono";
 }
 
 nav {

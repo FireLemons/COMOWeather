@@ -35,3 +35,8 @@ body{
   -moz-font-feature-settings: 'liga';
   -moz-osx-font-smoothing: grayscale;
 }
+
+#main {
+  height: 100%;
+  overflow-y: scroll
+}

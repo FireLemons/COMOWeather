@@ -43,7 +43,8 @@
         </ul>
         <div id="city-id">
           <div class="input-field">
-            <input placeholder="city ID" type="number" class="indigo darken-3 white-text" v-model.number="config.weather.openWeatherMap.location['id']">
+            <input type="number" min="0" placeholder="city ID" class="indigo darken-3 white-text" v-model.number="config.weather.openWeatherMap.location['id']">
+            <p class="indigo darken-3">City codes can be found by searching the city <a href="https://openweathermap.org/find">here</a> and copying the id from the url</p>
           </div>
         </div>
         <div id="city-name">
@@ -51,7 +52,7 @@
             <input placeholder="city name" type="text" class="indigo darken-3 white-text" v-model="config.weather.openWeatherMap.location['name']">
           </div>
           <div class="input-field">
-            <abbreviation-autocomplete :data="ui.countryCodeAutocompleteData" :limit="10" :min-input-length="2" placeholder="country code"></abbreviation-autocomplete>
+            <abbreviation-autocomplete :data="ui.countryCodeAutocompleteData" :limit="10" :min-input-length="2" placeholder="country code" @select="setCountryCode"></abbreviation-autocomplete>
           </div>
         </div>
         <div id="coord">

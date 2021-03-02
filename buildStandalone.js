@@ -54,7 +54,7 @@ const sources = {
 }
 
 const buildTrees = [
-  /*new DependencyTree(
+  new DependencyTree(
     './configMaker/index.html',
     sources['configMaker.mustache'],
     [
@@ -63,10 +63,9 @@ const buildTrees = [
     ],
     buildHTML,
     {
-      'extended-path': '../',
       'js-possible':   true
     }
-  ),*/
+  ),
   new DependencyTree(
     './configMaker/css/configMaker.css',
     sources['configMaker.scss'],

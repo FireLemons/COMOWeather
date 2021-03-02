@@ -22,10 +22,11 @@
     "sass": "^1.32.8"
   },
   "nodemonConfig": {
-    "ext": "mustache,js",
+    "ext": "scss,mustache,js",
     "watch": [
       "build.js",
       "configMaker/templates/",
+      "css/scss",
       "templates/"
     ]
   }

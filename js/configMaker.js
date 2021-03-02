@@ -1020,8 +1020,7 @@ const configManager = new Vue({
     },
     ui: {
       configJSON: {
-        configText: "",
-        configTextEdited: false
+        configText: ""
       },
       countryCodeAutocompleteData: countryCodeAutocompleteData,
       weather: {
@@ -1032,6 +1031,9 @@ const configManager = new Vue({
     }
   },
   methods: {
+    setCountryCode (country) {
+      this.$set(this.config.weather.openWeatherMap.location, 'countryCode', country.a)
+    }
   },
   mounted: function() {
     M.Tabs.init(document.querySelectorAll('.tabs'))
@@ -1041,10 +1043,8 @@ const configManager = new Vue({
   },
   watch: {
     config: {
-      handler: function(updatedConfig){
-        if(!this.ui.configJSON.configTextEdited){
-          this.ui.configJSON.configText = JSON.stringify(this.config, null, 2)
-        }
+      handler: function (updatedConfig, oldConfig) {
+        this.ui.configJSON.configText = JSON.stringify(this.config, null, 2)
       },
       deep: true
     }

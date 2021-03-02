@@ -55,10 +55,9 @@ input[type=number]::-webkit-inner-spin-button {
   margin: 0;
 }
 
-input[type=number] {
+.input-field input[type=number] {
   -moz-appearance: textfield;
 }
-
 .input-field input[type=text], .input-field input[type=number] {
   box-sizing: border-box;
   padding-left: 1em;
@@ -66,7 +65,7 @@ input[type=number] {
 .input-field input[type=text]:focus + label {
   color: white !important;
 }
-.input-field input[type=text]:focus, .input-field textarea:focus {
+.input-field input:focus, .input-field textarea:focus {
   border-bottom: 1px solid white !important;
   box-shadow: 0 1px 0 0 white !important;
 }
@@ -75,6 +74,19 @@ input[type=number] {
 }
 .input-field textarea.code {
   font-family: "Ubuntu Mono";
+}
+.input-field .abbreviation-autocomplete input {
+  margin-bottom: 0;
+}
+.input-field .abbreviation-autocomplete ul {
+  background-color: #283593 !important;
+  color: #bbb;
+}
+.input-field .abbreviation-autocomplete ul li span.highlight {
+  color: white;
+}
+.input-field .abbreviation-autocomplete ul li.selected {
+  background-color: #3949ab;
 }
 
 nav {

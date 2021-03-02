@@ -15,11 +15,11 @@ input[type=number]::-webkit-inner-spin-button {
   margin: 0;
 }
 
-input[type=number] {
-  -moz-appearance:textfield;
-}
-
 .input-field {
+  input[type=number] {
+    -moz-appearance:textfield;
+  }
+
   input[type="text"], input[type="number"] {
     box-sizing: border-box;
     padding-left: 1em
@@ -29,7 +29,7 @@ input[type=number] {
     color: white !important;
   }
 
-  input[type=text]:focus, textarea:focus {
+  input:focus, textarea:focus {
     border-bottom: 1px solid white !important;
     box-shadow: 0 1px 0 0 white !important;
   }
@@ -41,4 +41,27 @@ input[type=number] {
   textarea.code {
     font-family: "Ubuntu Mono"
   }
+
+  .abbreviation-autocomplete {
+    input {
+      margin-bottom: 0
+    }
+
+    ul {
+      background-color: #283593 !important;
+      color: #bbb;
+
+      li {
+        span.highlight {
+          color: white
+        }
+      }
+
+      li.selected {
+        background-color: #3949ab;
+      }
+
+    }
+  }
 }
+

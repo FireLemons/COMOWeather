@@ -23,17 +23,10 @@
         <h5 class="white-text">Twitter</h5>
         <div class="input-field">
           <input placeholder="consumer key" type="text" class="indigo darken-3 white-text" v-model="config.twitter.consumer_key">
-        </div>
-        <div class="input-field">
           <input placeholder="consumer secret" type="text" class="indigo darken-3 white-text" v-model="config.twitter.consumer_secret">
-        </div>
-        <div class="input-field">
           <input placeholder="access token key" type="text" class="indigo darken-3 white-text" v-model="config.twitter.access_token_key">
-        </div>
-        <div class="input-field">
           <input placeholder="access token secret" type="text" class="indigo darken-3 white-text" v-model="config.twitter.access_token_secret">
         </div>
-
         <h5 class="white-text">OpenWeatherMap</h5>
         <h6 class="white-text">Location</h6>
         <ul class="tabs indigo darken-3">
@@ -51,16 +44,12 @@
         <div id="city-name">
           <div class="input-field">
             <input placeholder="city name" type="text" class="indigo darken-3 white-text" v-model="config.weather.openWeatherMap.location['name']">
-          </div>
-          <div class="input-field">
             <abbreviation-autocomplete :data="ui.countryCodeAutocompleteData" :limit="10" :min-input-length="2" placeholder="country code" @select="setCountryCode"></abbreviation-autocomplete>
           </div>
         </div>
         <div id="coord">
           <div class="input-field">
             <input placeholder="latitude" type="number" min="-90" max="90" class="indigo darken-3 white-text" v-model="config.weather.openWeatherMap.location['lat']">
-          </div>
-          <div class="input-field">
             <input placeholder="longitude" type="number" min="-180" max="180" class="indigo darken-3 white-text" v-model="config.weather.openWeatherMap.location['long']">
           </div>
         </div>

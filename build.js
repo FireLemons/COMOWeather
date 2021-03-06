@@ -44,6 +44,7 @@ function buildCSS (generatedFilePath, primarySource, secondarySources) {
 
 const sources = {
   'about.mustache':         new SourceFile('./templates/about.mustache'),
+  'about.scss':             new SourceFile('./css/scss/about.scss'),
   'aboutText.mustache':     new SourceFile('./templates/aboutText.mustache'),
   'configMaker.mustache':   new SourceFile('./templates/configMaker.mustache'),
   'configMaker.scss':       new SourceFile('./css/scss/configMaker.scss'),
@@ -87,6 +88,15 @@ const buildTrees = [
       'extended-path': '../',
       'js-possible':   true
     }
+  ),
+  new DependencyTree(
+    './css/about.css',
+    sources['about.scss'],
+    [
+      sources['nav.scss'],
+      sources['theme.scss'],
+    ],
+    buildCSS
   ),
   new DependencyTree(
     './css/configMaker.css',

@@ -28,6 +28,9 @@
           <input placeholder="access token secret" type="text" class="indigo darken-3 white-text" v-model="config.twitter.access_token_secret">
         </div>
         <h5 class="white-text">OpenWeatherMap</h5>
+          <div class="input-field">
+            <input placeholder="api key" type="text" class="indigo darken-3 white-text" v-model="config.weather.openWeatherMap['key']">
+          </div>
         <h6 class="white-text">Location</h6>
         <ul class="tabs indigo darken-3">
           <li class="tab"><a href="#city-id" class="white-text" @click="ui.weather.openWeatherMap.locationTypeTab = 'id'">City ID</a></li>

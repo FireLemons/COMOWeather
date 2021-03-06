@@ -47,6 +47,7 @@ const sources = {
   'aboutText.mustache':     new SourceFile('./templates/aboutText.mustache'),
   'configMaker.mustache':   new SourceFile('./templates/configMaker.mustache'),
   'configMaker.scss':       new SourceFile('./css/scss/configMaker.scss'),
+  'index.scss':             new SourceFile('./css/scss/index.scss'),
   'index.mustache':         new SourceFile('./templates/index.mustache'),
   'aboutModal.mustache':    new SourceFile('./templates/aboutModal.mustache'),
   'nav.mustache':           new SourceFile('./templates/nav.mustache'),
@@ -94,6 +95,15 @@ const buildTrees = [
       sources['nav.scss'],
       sources['theme.scss'],
       sources['themeForms.scss']
+    ],
+    buildCSS
+  ),
+  new DependencyTree(
+    './css/index.css',
+    sources['index.scss'],
+    [
+      sources['nav.scss'],
+      sources['theme.scss'],
     ],
     buildCSS
   ),

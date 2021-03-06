@@ -1,0 +1,121 @@
+@font-face {
+  font-family: Roboto;
+  src: url(../assets/font/roboto/Roboto-Regular.ttf);
+}
+
+@font-face {
+  font-family: Roboto;
+  src: url(../assets/font/roboto/Roboto-Bold.ttf);
+  font-weight: bold;
+}
+
+body {
+  margin: 0;
+}
+
+#guide {
+  font-family: Helvetica, Roboto;
+  height: 80vh; width: 50%;
+  margin: 5px;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  h2, h3 {
+    margin: .5em;
+  }
+
+  img {
+    width: calc(100% - 1em);
+    margin: 0 .5em;
+  }
+
+  table {
+    background-color: #324a75;
+    border-collapse: collapse;
+    margin: .5em;
+    overflow: hidden;
+    text-align: center;
+    width: calc(100% - 1em);
+
+    img {
+      width: 36px;
+    }
+
+    td {
+      border: 2px solid #282e32;
+      color: #9ebad9;
+    }
+
+    td, tr:last-child {
+      border-bottom: 0;
+    }
+
+    td:first-child {
+      border-left: 0;
+    }
+
+    td:last-child {
+      border-right: 0;
+      font-size: 14pt
+    }
+
+    th {
+      background-color: #213d70;
+      color: #adc3db;
+      font-size: 14pt;
+      padding: .75em;
+    }
+
+    tr:nth-child(2n) {
+      background-color: #536078;
+    }
+  }
+}
+
+#main {
+  display: flex;
+  padding: 5% 10% 0 10%;
+
+  & > div {
+    padding: 5px;
+  }
+}
+
+#tweets{
+  width: 50%;
+
+  a {
+    color: orange;
+    font-size: 18pt;
+    font-weight: bold;
+  }
+}
+
+@media screen and (max-aspect-ratio: 8/7){
+  body{
+    overflow: hidden;
+  }
+  
+  #guide{
+    margin: 5px;
+    height: auto; width: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  
+  #main{
+    display: block;
+    height: 95%;
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  
+  #tweets {
+    width: auto;
+
+    iframe#twitter-widget-0 {
+      height: 24em !important;
+    }
+  }
+}

@@ -1002,52 +1002,122 @@ const configManager = new Vue({
   data: {
     config: {
       log: {
-        logDir: ""
+        logDir: ''
       },
       twitter: {
-        consumer_key: "",
-        consumer_secret: "",
-        access_token_key: "",
-        access_token_secret: ""
+        consumer_key: '',
+        consumer_secret: '',
+        access_token_key: '',
+        access_token_secret: ''
       },
       weather: {
         openWeatherMap: {
           location: {
           },
-          key: ""
+          key: ''
         }
       }
     },
     ui: {
       configJSON: {
-        configText: ""
+        configText: ''
       },
       countryCodeAutocompleteData: countryCodeAutocompleteData,
       weather: {
         openWeatherMap: {
-          locationType: "id"
+          locationTypeTab: 'id',
+          locationTypeLastModified: null
         }
       }
     }
   },
   methods: {
+    // Checks if 2 objects are equal (shallow comparison)
+    isShallowDifferent (objectA, objectB) {
+      if (!(objectA instanceof Object)) {
+        throw new TypeError('Param objectA must be an object')
+      }
+
+      if (!(objectB instanceof Object)) {
+        throw new TypeError('Param objectB must be an object')
+      }
+
+      if (Object.keys(objectA).length !== Object.keys(objectB).length) {
+        return false
+      } else {
+        for (const key in objectA) {
+          if (objectB[key] !== objectA[key]) {
+            return false
+          }
+        }
+      }
+
+      return true
+    },
+
+    // Resize the JSON textarea to be the correct height
+    resizeJSONDisplay () {
+      M.textareaAutoResize(document.getElementById('configJSON'))
+    },
+
     setCountryCode (country) {
       this.$set(this.config.weather.openWeatherMap.location, 'countryCode', country.a)
     }
   },
-  mounted: function() {
+  mounted: function () {
     M.Tabs.init(document.querySelectorAll('.tabs'))
-    M.textareaAutoResize(document.getElementById('configJSON'));
+    this.resizeJSONDisplay()
 
     this.ui.configJSON.configText = JSON.stringify(this.config, null, 2)
   },
   watch: {
     config: {
       handler: function (updatedConfig, oldConfig) {
-        this.ui.configJSON.configText = JSON.stringify(this.config, null, 2)
+        const configGenerated = JSON.parse(JSON.stringify(this.config))
+
+        const oldLocation = oldConfig.weather.openWeatherMap.location
+        const updatedLocation = updatedConfig.weather.openWeatherMap.location
+
+        if (this.isShallowDifferent(oldLocation, updatedLocation)) {
+          this.locationTypeLastModified = this.ui.weather.openWeatherMap.locationTypeTab
+        }
+
+        const configGeneratedOWM = configGenerated.weather.openWeatherMap
+        switch (this.locationTypeLastModified) {
+          case 'id':
+            configGeneratedOWM.location = {
+              id: updatedLocation.id
+            }
+
+            break
+          case 'name':
+            configGeneratedOWM.location = {
+              countryCode: updatedLocation.countryCode,
+              name: updatedLocation.name
+            }
+
+            break
+          case 'coord':
+            configGeneratedOWM.location = {
+              lat: updatedLocation.lat,
+              long: updatedLocation.long
+            }
+
+            break
+          case 'zip':
+            configGeneratedOWM.location = {
+              zip: `${updatedLocation.zip},${updatedLocation.countryCode}`
+            }
+
+            break
+        }
+
+        this.ui.configJSON.configText = JSON.stringify(configGenerated, null, 2)
+        Vue.nextTick(() => {
+          this.resizeJSONDisplay()
+        })
       },
       deep: true
     }
   }
 })
-

@@ -38,5 +38,13 @@ body {
 }
 
 #configJSON {
-  padding: .75em
+  textarea {
+    padding: .75em
+  }
+
+  .btn {
+    position: absolute;
+    right: .5em;
+    top: .5em
+  }
 }

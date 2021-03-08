@@ -64,8 +64,12 @@
         </div>
 
         <h4 class="white-text">Config JSON</h4>
-        <div class="input-field">
-          <textarea readonly id="configJSON" class="code materialize-textarea darken-3 indigo white-text" v-model="ui.configJSON.configText"></textarea>
+        <div id="configJSON" class="input-field">
+          <a class="btn indigo darken-4 clear" @click="copyConfigToClipboard">
+            {{ ui.copyText }} <i class="inline-icon material-icons">content_paste</i>
+          </a>
+          <textarea readonly class="code materialize-textarea darken-3 indigo white-text" v-model="ui.configJSON.configText">
+          </textarea>
         </div>
       </div>
     </div>

@@ -1019,6 +1019,7 @@ const configManager = new Vue({
       }
     },
     ui: {
+      copyText: 'Copy to clipboard',
       configJSON: {
         configText: ''
       },
@@ -1032,6 +1033,18 @@ const configManager = new Vue({
     }
   },
   methods: {
+    copyConfigToClipboard () {
+      navigator.clipboard.writeText(this.ui.configJSON.configText)
+        .then(() => {
+          console.log('AAA')
+          this.ui.copyText = 'Copied'
+
+          setTimeout(() => {
+            this.ui.copyText = 'Copy to clipboard'
+          }, 1000)
+        })
+    },
+
     // Checks if 2 objects are equal (shallow comparison)
     isShallowDifferent (objectA, objectB) {
       if (!(objectA instanceof Object)) {
@@ -1057,9 +1070,10 @@ const configManager = new Vue({
 
     // Resize the JSON textarea to be the correct height
     resizeJSONDisplay () {
-      M.textareaAutoResize(document.getElementById('configJSON'))
+      M.textareaAutoResize(document.querySelector('#configJSON textarea'))
     },
 
+    // Sets the country code
     setCountryCode (country) {
       this.$set(this.config.weather.openWeatherMap.location, 'countryCode', country.a)
     }
